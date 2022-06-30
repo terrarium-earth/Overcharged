@@ -1,0 +1,22 @@
+{
+  "type": "overcharged:smashing",
+  "hammerHits": 5,
+  "input": [
+    {
+      "item": "minecraft:raw_copper"
+    }
+  ],
+  "outputs": [
+    {
+      "item": {
+        "id": "overcharged:smashed_copper"
+      }
+    },
+    {
+      "item": {
+        "id": "overcharged:smashed_copper"
+      },
+      "dropChance": 0.25
+    }
+  ]
+}

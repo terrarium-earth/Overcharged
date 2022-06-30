@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "overcharged",
+  "version": "${version}",
+  "name": "Overcharged",
+  "description": "Tools that use energy for Forge and Fabric 1.18.2+",
+  "authors": [
+    "CodexAdrian",
+    "Kekie6"
+  ],
+  "contact": {
+    "website": "https://www.curseforge.com/minecraft/mc-mods/overcharged",
+    "repo": "https://github.com/CodexAdrian/Overcharged",
+    "issues": "https://github.com/CodexAdrian/Overcharged/issues"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "earth.terrarium.overcharged.fabric.OverchargedFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.8",
+    "minecraft": ">=1.18.2"
+  }
+}

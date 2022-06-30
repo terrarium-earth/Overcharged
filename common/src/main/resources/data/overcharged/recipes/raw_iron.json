@@ -1,0 +1,22 @@
+{
+  "type": "overcharged:smashing",
+  "hammerHits": 5,
+  "input": [
+    {
+      "item": "minecraft:raw_iron"
+    }
+  ],
+  "outputs": [
+    {
+      "item": {
+        "id": "overcharged:smashed_iron"
+      }
+    },
+    {
+      "item": {
+        "id": "overcharged:smashed_nickel"
+      },
+      "dropChance": 0.5
+    }
+  ]
+}
