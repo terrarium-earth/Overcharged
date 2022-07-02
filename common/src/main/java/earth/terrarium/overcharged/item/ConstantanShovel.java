@@ -14,7 +14,7 @@ public class ConstantanShovel extends ShovelItem implements EnergyItem {
     }
 
     @Override
-    public List<ToolMode> getToolModes() {
+    public List<ToolMode> getEmpoweredToolModes() {
         return List.of(AOEMode.THREE_BY_THREE_AOE, AOEMode.FIVE_BY_FIVE_AOE);
     }
 }

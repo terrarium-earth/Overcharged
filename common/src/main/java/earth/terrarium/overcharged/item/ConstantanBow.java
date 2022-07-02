@@ -75,7 +75,7 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     }
 
     @Override
-    public List<ToolMode> getToolModes() {
+    public List<ToolMode> getEmpoweredToolModes() {
         return List.of();
     }
 }

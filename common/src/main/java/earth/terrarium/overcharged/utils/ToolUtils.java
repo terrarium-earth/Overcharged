@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3f;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.registry.OverchargedItems;
 import net.minecraft.core.BlockPos;
@@ -91,33 +92,6 @@ public class ToolUtils {
         return ItemStack.EMPTY;
     }
 
-    public static void veinMine(ItemStack stack, Level level, BlockState state, BlockPos pos, Player miner) {
-        List<BlockPos> cachedPositions = new ArrayList<>();
-        cachedPositions.add(pos);
-        int index = 0;
-        int limit = 32;
-
-        while (index < limit) {
-            List<BlockPos> newCachedPositions = new ArrayList<>();
-            for (BlockPos logPos : cachedPositions) {
-                AABB box = new AABB(logPos).inflate(1);
-                Set<BlockPos> logList = BlockPos.betweenClosedStream(box)
-                        .filter(blockPos -> level.getBlockState(blockPos).is(state.getBlock()))
-                        .collect(Collectors.toSet());
-                for (BlockPos blockPos : logList) {
-                    if (index < limit) {
-                        newCachedPositions.add(blockPos);
-                        playerBreak(level, miner, stack, blockPos);
-                        index++;
-                    } else break;
-                }
-                newCachedPositions.addAll(logList);
-            }
-            if (newCachedPositions.isEmpty()) break;
-            cachedPositions = newCachedPositions;
-        }
-    }
-
     public static void playerBreak(Level world, Player player, ItemStack stack, BlockPos pos) {
         if(world instanceof ServerLevel serverLevel && world.mayInteract(player, pos)) {
             BlockState state = world.getBlockState(pos);
@@ -151,27 +125,8 @@ public class ToolUtils {
         }
     }
 
-    public static InteractionResult useHoe(UseOnContext useOnContext, EnergyItem energyItem) {
-        if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
-        BlockPos blockPos;
-        Level level = useOnContext.getLevel();
-        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = TILLABLES.get(level.getBlockState(blockPos = useOnContext.getClickedPos()).getBlock());
-        if (pair == null) {
-            return InteractionResult.PASS;
-        }
-        Predicate<UseOnContext> predicate = pair.getFirst();
-        Consumer<UseOnContext> consumer = pair.getSecond();
-        if (predicate.test(useOnContext)) {
-            Player player2 = useOnContext.getPlayer();
-            level.playSound(player2, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f);
-            if (!level.isClientSide) {
-                consumer.accept(useOnContext);
-                if (player2 != null) {
-                    energyItem.drainEnergy(useOnContext.getItemInHand(), 200);
-                }
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-        return InteractionResult.PASS;
+    @ExpectPlatform
+    public static BlockState getToolModifiedState(BlockState state, UseOnContext context, String toolAction) {
+        throw new AssertionError();
     }
 }

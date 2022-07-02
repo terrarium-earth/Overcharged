@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 public interface ToolMode {
     Component getName();
     void onTick(ItemStack stack);
-    void onUse(UseOnContext context, Consumer<UseOnContext> consumer);
+    void useTool(UseOnContext context, Consumer<UseOnContext> consumer);
     void onMineBlock(ItemStack stack, Level level, BlockHitResult hit, Player player);
     void onHitEntity(ItemStack stack, LivingEntity target, Player player);
 

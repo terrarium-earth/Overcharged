@@ -31,7 +31,7 @@ public class VeinMineMode implements ToolMode {
     }
 
     @Override
-    public void onUse(UseOnContext context, Consumer<UseOnContext> consumer) {
+    public void useTool(UseOnContext context, Consumer<UseOnContext> consumer) {
 
     }
 

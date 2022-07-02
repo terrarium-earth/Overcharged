@@ -44,7 +44,7 @@ public class AOEMode implements ToolMode {
     }
 
     @Override
-    public void onUse(UseOnContext context, Consumer<UseOnContext> consumer) {
+    public void useTool(UseOnContext context, Consumer<UseOnContext> consumer) {
         if(EnergyItem.isEmpowered(context.getItemInHand())) {
             AABB box = new AABB(context.getClickedPos()).inflate(radius);
             BlockPos.betweenClosedStream(box).map(blockPos -> new BlockHitResult(context.getClickLocation(), context.getClickedFace(), blockPos.immutable(), false)).map(blockHitResult -> new UseOnContext(Objects.requireNonNull(context.getPlayer()), context.getHand(), blockHitResult)).forEach(consumer);
