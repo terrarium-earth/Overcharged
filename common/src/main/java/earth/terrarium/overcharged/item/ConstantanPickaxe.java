@@ -35,4 +35,19 @@ public class ConstantanPickaxe extends PickaxeItem implements EnergyItem {
     public boolean mineBlock(@NotNull ItemStack itemStack, Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, @NotNull LivingEntity livingEntity) {
         return ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200);
     }
+
+    @Override
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
+    }
 }

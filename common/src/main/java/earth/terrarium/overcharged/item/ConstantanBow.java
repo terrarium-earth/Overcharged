@@ -92,7 +92,17 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     }
 
     @Override
-    public ToolMode defaultToolMode() {
-        return null;
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
     }
 }

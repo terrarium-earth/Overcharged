@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ConstantanHoe extends HoeItem implements EnergyItem {
-    protected ConstantanHoe(Tier tier, int i, float f, Properties properties) {
-        super(tier, i, f, properties);
+    public ConstantanHoe(int i, float f, Properties properties) {
+        super(ConstantanTier.INSTANCE, i, f, properties);
     }
 
     @Override
@@ -42,5 +42,20 @@ public class ConstantanHoe extends HoeItem implements EnergyItem {
     @Override
     public boolean mineBlock(@NotNull ItemStack itemStack, @NotNull Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, @NotNull LivingEntity livingEntity) {
         return ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200);
+    }
+
+    @Override
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
     }
 }

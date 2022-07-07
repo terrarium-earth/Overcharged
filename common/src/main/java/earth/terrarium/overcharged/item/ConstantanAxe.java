@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ConstantanAxe extends AxeItem implements EnergyItem {
-    protected ConstantanAxe(float f, float g, Properties properties) {
+    public ConstantanAxe(float f, float g, Properties properties) {
         super(ConstantanTier.INSTANCE, f, g, properties);
     }
 
@@ -45,5 +45,20 @@ public class ConstantanAxe extends AxeItem implements EnergyItem {
     @Override
     public boolean mineBlock(@NotNull ItemStack itemStack, @NotNull Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, @NotNull LivingEntity livingEntity) {
         return ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200);
+    }
+
+    @Override
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
     }
 }

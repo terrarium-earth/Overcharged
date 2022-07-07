@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "overcharged:block/coal_generator"
+    }
+  }
+}

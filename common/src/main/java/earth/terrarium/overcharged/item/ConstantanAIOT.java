@@ -20,8 +20,7 @@ import java.util.List;
 
 public class ConstantanAIOT extends DiggerItem implements EnergyItem {
 
-
-    protected ConstantanAIOT(float f, float g, Properties properties) {
+    public ConstantanAIOT(float f, float g, Properties properties) {
         super(f, g, ConstantanTier.INSTANCE, ToolUtils.getAIOTBlockTag(), properties);
     }
 
@@ -67,5 +66,20 @@ public class ConstantanAIOT extends DiggerItem implements EnergyItem {
     @Override
     public boolean isCorrectToolForDrops(@NotNull BlockState blockState) {
         return true;
+    }
+
+    @Override
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
     }
 }

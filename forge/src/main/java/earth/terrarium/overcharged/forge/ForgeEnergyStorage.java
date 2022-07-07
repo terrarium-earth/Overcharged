@@ -1,4 +1,4 @@
-package earth.terrarium.overcharged;
+package earth.terrarium.overcharged.forge;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;

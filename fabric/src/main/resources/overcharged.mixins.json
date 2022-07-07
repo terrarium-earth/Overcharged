@@ -4,6 +4,10 @@
   "package": "earth.terrarium.overcharged.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "EnergyItemMixin",
+    "AxeItemAccessor",
+    "HoeItemAccessor",
+    "ShovelItemAccessor"
   ],
   "client": [
   ],

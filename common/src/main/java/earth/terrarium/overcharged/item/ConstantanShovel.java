@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ConstantanShovel extends ShovelItem implements EnergyItem {
-    public ConstantanShovel(Tier tier, float f, float g, Properties properties) {
-        super(tier, f, g, properties);
+    public ConstantanShovel(float f, float g, Properties properties) {
+        super(ConstantanTier.INSTANCE, f, g, properties);
     }
 
     @Override
@@ -32,5 +32,20 @@ public class ConstantanShovel extends ShovelItem implements EnergyItem {
     @Override
     public List<ToolMode> getEmpoweredToolModes() {
         return List.of(AOEMode.THREE_BY_THREE_AOE, AOEMode.FIVE_BY_FIVE_AOE);
+    }
+
+    @Override
+    public boolean isBarVisible(@NotNull ItemStack itemStack) {
+        return hasEnoughEnergy(itemStack, 1);
+    }
+
+    @Override
+    public int getBarWidth(@NotNull ItemStack itemStack) {
+        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack itemStack) {
+        return 0xFFDB12;
     }
 }

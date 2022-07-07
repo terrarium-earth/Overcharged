@@ -14,9 +14,16 @@ configurations {
     developmentForge.extendsFrom common
 }
 
+loom {
+    forge {
+        mixinConfig "overcharged.mixins.json"
+    }
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
     modApi("com.teamresourceful.resourcefullib:resourcefullib-forge-$rootProject.resourcefullib_version")
+    modImplementation "curse.maven:charginggadgets-399757:3828008"
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }

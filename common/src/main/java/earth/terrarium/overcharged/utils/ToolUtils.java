@@ -8,6 +8,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.registry.OverchargedItems;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -117,5 +118,14 @@ public class ToolUtils {
 
     public static TagKey<Block> getAIOTBlockTag() {
         return TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(ArchitecturyTarget.getCurrentTarget().equals("forge") ? "forge" : "c", "mineable/aiot"));
+    }
+
+    public static float itemProperty(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
+        if (itemStack.getItem() instanceof EnergyItem energyItem) {
+            if(!energyItem.hasEnoughEnergy(itemStack, 1)) return 0;
+            else if(EnergyItem.isEmpowered(itemStack)) return 1;
+            else return 0.5f;
+        }
+        else return 0;
     }
 }
