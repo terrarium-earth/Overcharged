@@ -2,6 +2,8 @@ package earth.terrarium.overcharged.fabric;
 
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ToolMode;
+import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.registry.OverchargedBlocks;
 import earth.terrarium.overcharged.registry.OverchargedItems;
 import earth.terrarium.overcharged.registry.OverchargedRecipes;
@@ -21,10 +23,14 @@ public class OverchargedFabric implements ModInitializer {
             if (stack.getItem() instanceof EnergyItem energyItem) {
                 if (!energyItem.hasEnoughEnergy(stack, 200)) return false;
                 if (EnergyItem.isEmpowered(stack)) {
-                    energyItem.getCurrentToolMode(stack).onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
+                    ToolMode currentToolMode = energyItem.getCurrentToolMode(stack);
+                    if(currentToolMode != null) {
+                        currentToolMode.onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
+                    }
                 }
             }
             return true;
         });
+        NetworkHandler.registerPackets();
     }
 }

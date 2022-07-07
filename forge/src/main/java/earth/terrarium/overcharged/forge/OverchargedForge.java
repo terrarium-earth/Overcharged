@@ -2,6 +2,7 @@ package earth.terrarium.overcharged.forge;
 
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.registry.forge.OverchargedBlocksImpl;
 import earth.terrarium.overcharged.registry.forge.OverchargedItemsImpl;
 import earth.terrarium.overcharged.registry.forge.OverchargedRecipesImpl;
@@ -14,6 +15,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Overcharged.MODID)
@@ -26,6 +28,11 @@ public class OverchargedForge {
         OverchargedBlocksImpl.BLOCKS.register(eventBus);
         OverchargedRecipesImpl.RECIPE_TYPES.register(eventBus);
         OverchargedRecipesImpl.RECIPE_SERIALIZERS.register(eventBus);
+    }
+
+    @SubscribeEvent
+    public static void commonSetup(FMLCommonSetupEvent event) {
+        NetworkHandler.registerPackets();
     }
 
     @SubscribeEvent

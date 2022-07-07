@@ -1,6 +1,7 @@
 package earth.terrarium.overcharged;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.registry.OverchargedBlocks;
 import earth.terrarium.overcharged.registry.OverchargedItems;
 import earth.terrarium.overcharged.registry.OverchargedRecipes;

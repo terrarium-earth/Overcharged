@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "earth.terrarium.overcharged.fabric.OverchargedFabric"
+    ],
+    "client": [
+      "earth.terrarium.overcharged.fabric.OverchargedFabricClient"
     ]
   },
   "depends": {

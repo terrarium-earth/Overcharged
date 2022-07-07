@@ -37,6 +37,7 @@ public record EmpoweredPacket() implements Packet<EmpoweredPacket> {
 
         @Override
         public PacketContext handle(EmpoweredPacket empoweredPacket) {
+
             return (player, level) -> {
                 ItemStack stack = player.getMainHandItem();
                 if (stack.getItem() instanceof EnergyItem) {

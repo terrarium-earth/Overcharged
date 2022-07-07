@@ -37,26 +37,25 @@ public class ConstantanAIOT extends DiggerItem implements EnergyItem {
         try {
             type = ToolType.valueOf(toolType);
         } catch (IllegalArgumentException exception) {
-            Overcharged.LOGGER.warn("Constantan Paxel item has invalid tooltype NBT");
+            Overcharged.LOGGER.warn("Constantan AIOT item has invalid tooltype NBT");
             type = ToolType.HOE;
         }
         return type;
     }
 
-    public void changeToolType(Player player, ItemStack stack) {
+    public ToolType changeToolType(Player player, ItemStack stack) {
         String toolType = stack.getOrCreateTag().getString("ToolType");
         if(toolType.isEmpty()) toolType = ToolType.HOE.toString();
         ToolType type;
         try {
             type = ToolType.valueOf(toolType);
-            List<ToolType> types = List.of(ToolType.values());
-            stack.getOrCreateTag().putString("ToolType", types.get((types.indexOf(type) + 1) % types.size()).toString());
-        } catch (IllegalArgumentException exception) {
+            type = ToolType.values()[(type.ordinal() + 1) % ToolType.values().length];
+        } catch (Exception exception) {
             type = ToolType.HOE;
-            Overcharged.LOGGER.warn("Constantan Paxel item has invalid tooltype NBT");
-            stack.getOrCreateTag().putString("ToolType", ToolType.HOE.toString());
+            Overcharged.LOGGER.warn("Constantan AIOT item had an exception: ", exception);
         }
         player.displayClientMessage(Component.translatable("messsages.overcharged.aiot_tool_type", type.toString()), true);
+        return type;
     }
 
     @Override

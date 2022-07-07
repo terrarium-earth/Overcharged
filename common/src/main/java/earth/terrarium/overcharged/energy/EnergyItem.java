@@ -34,20 +34,12 @@ public interface EnergyItem {
         return 800000;
     }
 
-    default void addEnergy(ItemStack stack, int energy) {
-        this.setEnergy(stack, this.getEnergy(stack) + energy);
-    }
-
     default void drainEnergy(ItemStack stack, int energy) {
         this.setEnergy(stack, this.getEnergy(stack) - energy);
     }
 
     default boolean hasEnoughEnergy(ItemStack stack, int energy) {
         return getEnergy(stack) >= energy;
-    }
-
-    default boolean isFull(ItemStack stack) {
-        return getEnergy(stack) >= getMaxEnergy();
     }
 
     static boolean isEmpowered(ItemStack stack) {
@@ -69,12 +61,12 @@ public interface EnergyItem {
         } else return null;
     }
 
-    default void changeToolMode(Player player, ItemStack stack) {
+    default void changeToolMode(Player player, ItemStack stack, int index) {
         if(isEmpowered(stack)) {
-            stack.getOrCreateTag().putInt("ToolMode", (stack.getOrCreateTag().getInt("ToolMode") + 1) % this.getEmpoweredToolModes().size());
+            stack.getOrCreateTag().putInt("ToolMode", index % this.getEmpoweredToolModes().size());
             ToolMode currentToolMode = getCurrentToolMode(stack);
             if(currentToolMode != null) {
-                player.displayClientMessage(currentToolMode.getName(), true);
+                player.displayClientMessage(Component.translatable("messsages.overcharged.aiot_tool_type", currentToolMode.getName()), true);
             }
         }
     }
@@ -137,6 +129,7 @@ public interface EnergyItem {
     }
 
     default InteractionResult shovelAction(UseOnContext useOnContext) {
+        if (!this.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
         Level level = useOnContext.getLevel();
         BlockPos blockPos = useOnContext.getClickedPos();
         BlockState blockState = level.getBlockState(blockPos);
