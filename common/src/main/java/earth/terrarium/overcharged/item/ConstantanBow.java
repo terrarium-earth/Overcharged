@@ -2,6 +2,8 @@ package earth.terrarium.overcharged.item;
 
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.energy.ToolMode;
+import earth.terrarium.overcharged.entity.PoweredArrow;
+import earth.terrarium.overcharged.registry.OverchargedEntities;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.tools.Tool;
 import java.util.List;
@@ -29,12 +32,11 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     @Override
     public void releaseUsing(@NotNull ItemStack bow, @NotNull Level level, @NotNull LivingEntity livingEntity, int i) {
         if(livingEntity instanceof Player player && bow.getItem() instanceof EnergyItem bowEnergy) {
-            ItemStack quiver = ToolUtils.findQuiver(player);
-            int energyUsage = EnergyItem.isEmpowered(bow) ? 200 : 400;
+            int energyUsage = EnergyItem.isEmpowered(bow) ? 400 : 200;
             float drawPower = BowItem.getPowerForTime(this.getUseDuration(bow) - i);
-            if(!bowEnergy.hasEnoughEnergy(bow, energyUsage) || quiver.isEmpty() || drawPower < 0.1F) return;
+            if(!bowEnergy.hasEnoughEnergy(bow, energyUsage) || drawPower < 0.1F) return;
             if (!level.isClientSide) {
-                AbstractArrow abstractArrow = ConstantanQuiver.createChargedArrow(quiver, bow, player);
+                AbstractArrow abstractArrow = this.createChargedArrow(bow, player);
                 if (abstractArrow == null) {
                     return;
                 }
@@ -64,18 +66,33 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+    public InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        ItemStack quiver = ToolUtils.findQuiver(player);
-        if (player.getAbilities().instabuild || !quiver.isEmpty()) {
-            player.startUsingItem(interactionHand);
+        if (player.getAbilities().instabuild || this.hasEnoughEnergy(itemStack, EnergyItem.isEmpowered(itemStack) ? 400 : 200)) {
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
     }
 
+    @Nullable
+    public PoweredArrow createChargedArrow(ItemStack bow, Player player) {
+        PoweredArrow arrow = OverchargedEntities.POWERED_ARROW.get().create(player.getLevel());
+        if(arrow != null) {
+            arrow.setOwner(player);
+            arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
+            arrow.setEmpowered(EnergyItem.isEmpowered(bow));
+            return arrow;
+        }
+        return null;
+    }
+
     @Override
     public List<ToolMode> getEmpoweredToolModes() {
         return List.of();
+    }
+
+    @Override
+    public ToolMode defaultToolMode() {
+        return null;
     }
 }

@@ -27,17 +27,14 @@ public class ConstantanAxe extends AxeItem implements EnergyItem {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext useOnContext) {
-        var action = this.axeAction(useOnContext);
-        ItemStack itemInHand = useOnContext.getItemInHand();
-        if(EnergyItem.isEmpowered(itemInHand)) {
-            getCurrentToolMode(itemInHand).useTool(useOnContext, this::axeAction);
-        }
-        return action;
+    public InteractionResult useOn(@NotNull UseOnContext useOnContext) {
+        return ToolType.AXE.getFunction().apply(this, useOnContext);
     }
 
-    private Optional<BlockState> getStripped(BlockState blockState) {
-        return Optional.ofNullable(STRIPPABLES.get(blockState.getBlock())).map(block -> block.defaultBlockState().setValue(RotatedPillarBlock.AXIS, blockState.getValue(RotatedPillarBlock.AXIS)));
+    @Override
+    public float getDestroySpeed(@NotNull ItemStack itemStack, @NotNull BlockState blockState) {
+        float speed = super.getDestroySpeed(itemStack, blockState);
+        return this.hasEnoughEnergy(itemStack, 200) ? EnergyItem.isEmpowered(itemStack) ? speed * 1.2F : speed : 0;
     }
 
     @Override
@@ -47,22 +44,6 @@ public class ConstantanAxe extends AxeItem implements EnergyItem {
 
     @Override
     public boolean mineBlock(@NotNull ItemStack itemStack, @NotNull Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, @NotNull LivingEntity livingEntity) {
-        if(ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200)) {
-            if(EnergyItem.isEmpowered(itemStack) && livingEntity instanceof Player player) {
-                getCurrentToolMode(itemStack).onMineBlock(itemStack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public List<ToolMode> getEmpoweredToolModes() {
-        return List.of(AOEMode.THREE_BY_THREE_AOE, AOEMode.FIVE_BY_FIVE_AOE, VeinMineMode.VEIN_MINING);
-    }
-
-    @Override
-    public ToolMode defaultToolMode() {
-        return null;
+        return ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200);
     }
 }

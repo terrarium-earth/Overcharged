@@ -24,16 +24,14 @@ public class ConstantanHoe extends HoeItem implements EnergyItem {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext useOnContext) {
-        ItemStack itemInHand = useOnContext.getItemInHand();
-        if(this.hasEnoughEnergy(itemInHand, 200)) {
-            var action = this.hoeAction(useOnContext);
-            if (EnergyItem.isEmpowered(itemInHand)) {
-                getCurrentToolMode(itemInHand).useTool(useOnContext, this::hoeAction);
-            }
-            return action;
-        }
-        return InteractionResult.PASS;
+    public InteractionResult useOn(@NotNull UseOnContext useOnContext) {
+        return ToolType.HOE.getFunction().apply(this, useOnContext);
+    }
+
+    @Override
+    public float getDestroySpeed(@NotNull ItemStack itemStack, @NotNull BlockState blockState) {
+        float speed = super.getDestroySpeed(itemStack, blockState);
+        return this.hasEnoughEnergy(itemStack, 200) ? EnergyItem.isEmpowered(itemStack) ? speed * 1.2F : speed : 0;
     }
 
     @Override
@@ -44,15 +42,5 @@ public class ConstantanHoe extends HoeItem implements EnergyItem {
     @Override
     public boolean mineBlock(@NotNull ItemStack itemStack, @NotNull Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, @NotNull LivingEntity livingEntity) {
         return ToolUtils.mineBlock(this, itemStack, level, blockState, blockPos, 200);
-    }
-
-    @Override
-    public List<ToolMode> getEmpoweredToolModes() {
-        return List.of(AOEMode.THREE_BY_THREE_AOE, AOEMode.FIVE_BY_FIVE_AOE, VeinMineMode.VEIN_MINING);
-    }
-
-    @Override
-    public ToolMode defaultToolMode() {
-        return null;
     }
 }

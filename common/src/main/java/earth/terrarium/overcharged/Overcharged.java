@@ -27,4 +27,5 @@ public class Overcharged {
     public static CreativeModeTab registerItemGroup(ResourceLocation id, ItemStack icon) {
         throw new AssertionError();
     }
+
 }

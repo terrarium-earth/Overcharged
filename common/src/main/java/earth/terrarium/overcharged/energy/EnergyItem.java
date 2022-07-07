@@ -1,7 +1,10 @@
 package earth.terrarium.overcharged.energy;
 
-import com.mojang.datafixers.util.Pair;
+import earth.terrarium.overcharged.utils.ToolUtils;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -11,13 +14,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public interface EnergyItem {
-    //Github copilot is too good.
+    //GitHub copilot is too good.
 
     default int getEnergy(ItemStack stack) {
         return 0;
@@ -25,7 +31,7 @@ public interface EnergyItem {
 
     default void setEnergy(ItemStack stack, int energy) {}
     default int getMaxEnergy() {
-        return 100000;
+        return 800000;
     }
 
     default void addEnergy(ItemStack stack, int energy) {
@@ -34,10 +40,6 @@ public interface EnergyItem {
 
     default void drainEnergy(ItemStack stack, int energy) {
         this.setEnergy(stack, this.getEnergy(stack) - energy);
-    }
-
-    default boolean hasEnergy(ItemStack stack) {
-        return getEnergy(stack) >= 0;
     }
 
     default boolean hasEnoughEnergy(ItemStack stack, int energy) {
@@ -56,14 +58,25 @@ public interface EnergyItem {
         stack.getOrCreateTag().putBoolean("Empowered", !isEmpowered(stack));
     }
 
-    List<ToolMode> getEmpoweredToolModes();
+    default List<ToolMode> getEmpoweredToolModes() {
+        return List.of(AOEMode.THREE_BY_THREE_AOE, AOEMode.FIVE_BY_FIVE_AOE, VeinMineMode.VEIN_MINING);
+    }
 
-    ToolMode defaultToolMode();
-
+    @Nullable
     default ToolMode getCurrentToolMode(ItemStack stack) {
         if(isEmpowered(stack)) {
             return getEmpoweredToolModes().get(stack.getOrCreateTag().getInt("ToolMode") % getEmpoweredToolModes().size());
-        } else return defaultToolMode();
+        } else return null;
+    }
+
+    default void changeToolMode(Player player, ItemStack stack) {
+        if(isEmpowered(stack)) {
+            stack.getOrCreateTag().putInt("ToolMode", (stack.getOrCreateTag().getInt("ToolMode") + 1) % this.getEmpoweredToolModes().size());
+            ToolMode currentToolMode = getCurrentToolMode(stack);
+            if(currentToolMode != null) {
+                player.displayClientMessage(currentToolMode.getName(), true);
+            }
+        }
     }
 
     default InteractionResult hoeAction(UseOnContext useOnContext) {
@@ -91,9 +104,10 @@ public interface EnergyItem {
         BlockPos blockPos = useOnContext.getClickedPos();
         Level level = useOnContext.getLevel();
         Player player2 = useOnContext.getPlayer();
-        BlockState optional = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "axe_strip");
-        BlockState optional2 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "axe_scrape");
-        BlockState optional3 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "axe_wax_off");
+        BlockState blockState = level.getBlockState(blockPos);
+        BlockState optional = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_strip");
+        BlockState optional2 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_scrape");
+        BlockState optional3 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_wax_off");
         ItemStack itemStack = useOnContext.getItemInHand();
         BlockState optional4 = null;
         if (optional != null) {
@@ -120,5 +134,82 @@ public interface EnergyItem {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return InteractionResult.PASS;
+    }
+
+    default InteractionResult shovelAction(UseOnContext useOnContext) {
+        Level level = useOnContext.getLevel();
+        BlockPos blockPos = useOnContext.getClickedPos();
+        BlockState blockState = level.getBlockState(blockPos);
+        if (useOnContext.getClickedFace() == Direction.DOWN) {
+            return InteractionResult.PASS;
+        } else {
+            Player player = useOnContext.getPlayer();
+            BlockState blockState2 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "shovel_flatten");
+            BlockState blockState3 = null;
+            if (blockState2 != null && level.getBlockState(blockPos.above()).isAir()) {
+                level.playSound(player, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+                blockState3 = blockState2;
+            } else if (blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT)) {
+                if (!level.isClientSide()) {
+                    level.levelEvent(null, 1009, blockPos, 0);
+                }
+
+                CampfireBlock.dowse(useOnContext.getPlayer(), level, blockPos, blockState);
+                blockState3 = blockState.setValue(CampfireBlock.LIT, false);
+            }
+
+            if (blockState3 != null) {
+                if (!level.isClientSide) {
+                    level.setBlock(blockPos, blockState3, 11);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState3));
+                    if (player != null) {
+                        this.drainEnergy(useOnContext.getItemInHand(), 200);
+                    }
+                }
+
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            } else {
+                return InteractionResult.PASS;
+            }
+        }
+    }
+
+    enum ToolType {
+        SHOVEL((energyItem, useOnContext) -> {
+            var action = energyItem.shovelAction(useOnContext);
+            ItemStack itemInHand = useOnContext.getItemInHand();
+            ToolMode currentToolMode = energyItem.getCurrentToolMode(itemInHand);
+            if(currentToolMode != null) {
+                currentToolMode.useTool(useOnContext, energyItem::shovelAction);
+            }
+            return action;
+        }),
+        HOE((energyItem, useOnContext) -> {
+            var action = energyItem.hoeAction(useOnContext);
+            ItemStack itemInHand = useOnContext.getItemInHand();
+            ToolMode currentToolMode = energyItem.getCurrentToolMode(itemInHand);
+            if(currentToolMode != null) {
+                currentToolMode.useTool(useOnContext, energyItem::hoeAction);
+            }
+            return action;
+        }),
+        AXE((energyItem, useOnContext) -> {
+            var action = energyItem.axeAction(useOnContext);
+            ItemStack itemInHand = useOnContext.getItemInHand();
+            ToolMode currentToolMode = energyItem.getCurrentToolMode(itemInHand);
+            if(currentToolMode != null) {
+                currentToolMode.useTool(useOnContext, energyItem::axeAction);
+            }
+            return action;
+        });
+
+        private final BiFunction<EnergyItem, UseOnContext, InteractionResult> function;
+        ToolType(BiFunction<EnergyItem, UseOnContext, InteractionResult> function) {
+            this.function = function;
+        }
+
+        public BiFunction<EnergyItem, UseOnContext, InteractionResult> getFunction() {
+            return function;
+        }
     }
 }

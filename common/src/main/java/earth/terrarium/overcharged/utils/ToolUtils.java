@@ -5,13 +5,17 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3f;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import dev.architectury.injectables.targets.ArchitecturyTarget;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.registry.OverchargedItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -73,25 +77,6 @@ public class ToolUtils {
         return false;
     }
 
-    public static ItemStack findQuiver(Player player) {
-        for (ItemStack item : player.getHandSlots()) {
-            if(item.is(OverchargedItems.CONSTANTAN_QUIVER.get())) {
-                return item;
-            }
-        }
-        for (ItemStack item : player.getArmorSlots()) {
-            if(item.is(OverchargedItems.CONSTANTAN_QUIVER.get())) {
-                return item;
-            }
-        }
-        for (ItemStack item : player.getInventory().items) {
-            if(item.is(OverchargedItems.CONSTANTAN_QUIVER.get())) {
-                return item;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
     public static void playerBreak(Level world, Player player, ItemStack stack, BlockPos pos) {
         if(world instanceof ServerLevel serverLevel && world.mayInteract(player, pos)) {
             BlockState state = world.getBlockState(pos);
@@ -128,5 +113,9 @@ public class ToolUtils {
     @ExpectPlatform
     public static BlockState getToolModifiedState(BlockState state, UseOnContext context, String toolAction) {
         throw new AssertionError();
+    }
+
+    public static TagKey<Block> getAIOTBlockTag() {
+        return TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(ArchitecturyTarget.getCurrentTarget().equals("forge") ? "forge" : "c", "mineable/aiot"));
     }
 }
