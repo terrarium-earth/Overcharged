@@ -5,6 +5,7 @@ import com.teamresourceful.resourcefullib.common.networking.base.NetworkDirectio
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
+import earth.terrarium.overcharged.network.messages.ToolModeCyclePacket;
 
 public class NetworkHandler {
     public static final NetworkChannel CHANNEL = new NetworkChannel(Overcharged.MODID, 0, "overcharged");
@@ -12,5 +13,6 @@ public class NetworkHandler {
     public static void registerPackets() {
         CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, EmpoweredPacket.ID, EmpoweredPacket.HANDLER, EmpoweredPacket.class);
         CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, AIOTToolTypePacket.ID, AIOTToolTypePacket.HANDLER, AIOTToolTypePacket.class);
+        CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ToolModeCyclePacket.ID, ToolModeCyclePacket.HANDLER, ToolModeCyclePacket.class);
     }
 }

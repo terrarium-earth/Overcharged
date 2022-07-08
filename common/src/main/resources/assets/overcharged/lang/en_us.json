@@ -2,5 +2,7 @@
   "category.overcharged.tools": "Overcharged",
   "key.overcharged.toggle_empowered": "Toggle Empowered",
   "key.overcharged.change_tool_type": "Cycle Tool Types",
-  "key.overcharged.change_tool_mode": "Cycle Empowered Tool Modes"
+  "key.overcharged.change_tool_mode": "Cycle Empowered Tool Modes",
+  "messages.overcharged.aiot_tool_type": "Changed AIOT Right Click type to %s",
+  "messages.overcharged.constantan_change_mode": "Changed Tool Mode to %s"
 }

@@ -18,24 +18,25 @@ import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 public class OverchargedFabricClient implements ClientModInitializer {
+
     private static final KeyMapping EMPOWER_KEYBIND = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.overcharged.toggle_empowered", // The translation key of the keybinding's name
             InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-            GLFW.GLFW_KEY_G, // The keycode of the key
+            GLFW.GLFW_KEY_B, // The keycode of the key
             "category.overcharged.tools" // The translation key of the keybinding's category.
     ));
 
     private static final KeyMapping TOOL_TYPE_KEYBIND = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.overcharged.change_tool_type", // The translation key of the keybinding's name
             InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-            GLFW.GLFW_KEY_G, // The keycode of the key
+            GLFW.GLFW_KEY_N, // The keycode of the key
             "category.overcharged.tools" // The translation key of the keybinding's category.
     ));
 
     private static final KeyMapping TOOL_MODE_KEYBIND = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.overcharged.change_tool_mode", // The translation key of the keybinding's name
             InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-            GLFW.GLFW_KEY_G, // The keycode of the key
+            GLFW.GLFW_KEY_M, // The keycode of the key
             "category.overcharged.tools" // The translation key of the keybinding's category.
     ));
     @Override

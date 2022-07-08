@@ -26,7 +26,7 @@ public class ConstantanShovel extends ShovelItem implements EnergyItem {
 
     @Override
     public InteractionResult useOn(@NotNull UseOnContext useOnContext) {
-        return ToolType.HOE.getFunction().apply(this, useOnContext);
+        return ToolType.SHOVEL.getFunction().apply(this, useOnContext);
     }
 
     @Override

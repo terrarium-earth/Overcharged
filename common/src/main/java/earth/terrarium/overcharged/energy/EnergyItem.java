@@ -66,7 +66,7 @@ public interface EnergyItem {
             stack.getOrCreateTag().putInt("ToolMode", index % this.getEmpoweredToolModes().size());
             ToolMode currentToolMode = getCurrentToolMode(stack);
             if(currentToolMode != null) {
-                player.displayClientMessage(Component.translatable("messsages.overcharged.aiot_tool_type", currentToolMode.getName()), true);
+                player.displayClientMessage(Component.translatable("messages.overcharged.constantan_change_mode", currentToolMode.getName()), true);
             }
         }
     }

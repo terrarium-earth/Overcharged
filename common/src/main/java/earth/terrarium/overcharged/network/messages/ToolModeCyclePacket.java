@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 public record ToolModeCyclePacket(int toolModeIndex) implements Packet<ToolModeCyclePacket> {
     public static final Handler HANDLER = new Handler();
-    public static final ResourceLocation ID = new ResourceLocation(Overcharged.MODID, "aiot_tool_type");
+    public static final ResourceLocation ID = new ResourceLocation(Overcharged.MODID, "tool_mode_cycle");
 
     @Override
     public ResourceLocation getID() {

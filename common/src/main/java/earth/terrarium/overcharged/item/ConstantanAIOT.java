@@ -53,7 +53,7 @@ public class ConstantanAIOT extends DiggerItem implements EnergyItem {
             type = ToolType.HOE;
             Overcharged.LOGGER.warn("Constantan AIOT item had an exception: ", exception);
         }
-        player.displayClientMessage(Component.translatable("messsages.overcharged.aiot_tool_type", type.toString()), true);
+        player.displayClientMessage(Component.translatable("messages.overcharged.aiot_tool_type", type.toString()), true);
         return type;
     }
 
