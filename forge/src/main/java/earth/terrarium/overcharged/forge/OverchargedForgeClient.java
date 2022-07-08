@@ -1,6 +1,7 @@
 package earth.terrarium.overcharged.forge;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import earth.terrarium.overcharged.OverchargedClient;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.item.ConstantanAIOT;
 import earth.terrarium.overcharged.network.NetworkHandler;
@@ -31,6 +32,7 @@ public class OverchargedForgeClient {
     public static void init(){
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(OverchargedForgeClient::keybindAction);
+        OverchargedClient.initClient();
     }
 
     private static final KeyMapping EMPOWER_KEYBIND = new KeyMapping(

@@ -1,7 +1,7 @@
 package earth.terrarium.overcharged.registry;
 
+import com.teamresourceful.resourcefullib.common.recipe.CodecRecipeSerializer;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import earth.terrarium.overcharged.data.CodecRecipeSerializer;
 import earth.terrarium.overcharged.data.SmashingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;

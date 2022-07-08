@@ -2,6 +2,7 @@ package earth.terrarium.overcharged.fabric;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.events.client.ClientTickEvent;
+import earth.terrarium.overcharged.OverchargedClient;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.item.ConstantanAIOT;
 import earth.terrarium.overcharged.network.NetworkHandler;
@@ -41,6 +42,7 @@ public class OverchargedFabricClient implements ClientModInitializer {
     ));
     @Override
     public void onInitializeClient() {
+        OverchargedClient.initClient();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             Player player = client.player;
             if (player != null) {

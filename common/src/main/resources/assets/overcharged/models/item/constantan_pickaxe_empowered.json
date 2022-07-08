@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "overcharged:item/constantan_pickaxe_empowered"
+  }
+}

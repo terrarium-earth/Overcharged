@@ -1,0 +1,20 @@
+{
+  "overrides": [
+    {
+      "predicate": {
+        "overcharged:energy_state": 0.5
+      },
+      "model": "overcharged:item/constantan_pickaxe_charged"
+    },
+    {
+      "predicate": {
+        "overcharged:energy_state": 1.0
+      },
+      "model": "overcharged:item/constantan_pickaxe_empowered"
+    }
+  ],
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "overcharged:item/constantan_pickaxe_uncharged"
+  }
+}

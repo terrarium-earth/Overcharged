@@ -122,10 +122,12 @@ public class ToolUtils {
 
     public static float itemProperty(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
         if (itemStack.getItem() instanceof EnergyItem energyItem) {
-            if(!energyItem.hasEnoughEnergy(itemStack, 1)) return 0;
-            else if(EnergyItem.isEmpowered(itemStack)) return 1;
-            else return 0.5f;
+            if(EnergyItem.isEmpowered(itemStack) && energyItem.hasEnoughEnergy(itemStack, 1)) {
+                return 1.0f;
+            } else if(energyItem.hasEnoughEnergy(itemStack, 1)){
+                return 0.5f;
+            }
         }
-        else return 0;
+        return 0;
     }
 }
