@@ -22,7 +22,7 @@ public class VeinMineMode implements ToolMode {
     public static final VeinMineMode VEIN_MINING = new VeinMineMode();
     @Override
     public Component getName() {
-        return Component.translatable("overcharged.tooltip.vein_mine");
+        return Component.translatable("tool_mode.overcharged.tooltip.vein_mine");
     }
 
     @Override

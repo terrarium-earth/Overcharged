@@ -25,8 +25,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class AOEMode implements ToolMode {
-    public static final AOEMode THREE_BY_THREE_AOE = new AOEMode(3);
-    public static final AOEMode FIVE_BY_FIVE_AOE = new AOEMode(5);
+    public static final AOEMode THREE_BY_THREE_AOE = new AOEMode(1);
+    public static final AOEMode FIVE_BY_FIVE_AOE = new AOEMode(2);
 
     public final int radius;
 
@@ -36,7 +36,7 @@ public class AOEMode implements ToolMode {
 
     @Override
     public Component getName() {
-        return Component.translatable("overcharged.tooltip.area_break", radius, radius);
+        return Component.translatable("tool_mode.overcharged.tooltip.area_break", radius * 2 + 1, radius * 2 + 1);
     }
 
     @Override

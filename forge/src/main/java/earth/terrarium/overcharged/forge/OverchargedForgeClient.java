@@ -32,7 +32,6 @@ public class OverchargedForgeClient {
     public static void init(){
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(OverchargedForgeClient::keybindAction);
-        OverchargedClient.initClient();
     }
 
     private static final KeyMapping EMPOWER_KEYBIND = new KeyMapping(
@@ -61,6 +60,11 @@ public class OverchargedForgeClient {
         event.register(EMPOWER_KEYBIND);
         event.register(TOOL_TYPE_KEYBIND);
         event.register(TOOL_MODE_KEYBIND);
+    }
+
+    @SubscribeEvent
+    public static void onInitializeClient(FMLClientSetupEvent event) {
+        OverchargedClient.initClient();
     }
 
     public static void keybindAction(InputEvent.Key event) {

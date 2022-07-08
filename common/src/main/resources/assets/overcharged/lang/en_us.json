@@ -3,6 +3,8 @@
   "key.overcharged.toggle_empowered": "Toggle Empowered",
   "key.overcharged.change_tool_type": "Cycle Tool Types",
   "key.overcharged.change_tool_mode": "Cycle Empowered Tool Modes",
+  "tool_mode.overcharged.tooltip.area_break": "%sx%s AOE Mode",
+  "tool_mode.overcharged.tooltip.vein_mine": "Vein Mine Mode",
   "messages.overcharged.aiot_tool_type": "Changed AIOT Right Click type to %s",
   "messages.overcharged.constantan_change_mode": "Changed Tool Mode to %s"
 }
