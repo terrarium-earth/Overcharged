@@ -2,6 +2,7 @@ package earth.terrarium.overcharged.forge;
 
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ToolMode;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.registry.forge.OverchargedBlocksImpl;
 import earth.terrarium.overcharged.registry.forge.OverchargedItemsImpl;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -47,9 +48,10 @@ public class OverchargedForge {
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof EnergyItem energyItem) {
             if (!energyItem.hasEnoughEnergy(stack, 200)) return;
-            if (EnergyItem.isEmpowered(stack)) {
-                Level level = event.getPlayer().getLevel();
-                energyItem.getCurrentToolMode(stack).onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
+            Level level = event.getPlayer().getLevel();
+            ToolMode currentToolMode = energyItem.getCurrentToolMode(stack);
+            if(currentToolMode != null) {
+                currentToolMode.onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
             }
         }
     }

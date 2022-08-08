@@ -64,7 +64,7 @@ public class AOEMode implements ToolMode {
                     case NORTH, SOUTH -> BoundingBox.fromCorners(anchorPoint.offset(radius, radius, 0), anchorPoint.offset(-radius, -radius, 0));
                 };
 
-                List<BlockPos> positions = BlockPos.betweenClosedStream(box).filter(blockPos1 -> diggerItem.isCorrectToolForDrops(level.getBlockState(blockPos1)) && level.getBlockState(blockPos1).getDestroySpeed(level, blockPos1) > 0).toList();
+                List<BlockPos> positions = BlockPos.betweenClosedStream(box).map(BlockPos::immutable).filter(blockPos1 -> diggerItem.isCorrectToolForDrops(level.getBlockState(blockPos1)) && level.getBlockState(blockPos1).getDestroySpeed(level, blockPos1) > 0).toList();
                 for (BlockPos position : positions) {
                     if(energyItem.hasEnoughEnergy(stack, 200)) {
                         energyItem.drainEnergy(stack, 200);

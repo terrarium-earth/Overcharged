@@ -17,19 +17,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.lwjgl.glfw.GLFW;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = "overcharged", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class OverchargedForgeClient {
 
-    public static void init(){
+    public static void init() {
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(OverchargedForgeClient::keybindAction);
     }
@@ -79,7 +77,7 @@ public class OverchargedForgeClient {
                     NetworkHandler.CHANNEL.sendToServer(new ToolModeCyclePacket(stack.getOrCreateTag().getInt("ToolMode") + 1));
                 }
                 while (TOOL_TYPE_KEYBIND.consumeClick()) {
-                    if(stack.getItem() instanceof ConstantanAIOT aiot) {
+                    if (stack.getItem() instanceof ConstantanAIOT aiot) {
                         NetworkHandler.CHANNEL.sendToServer(new AIOTToolTypePacket(aiot.changeToolType(player, stack)));
                     }
                 }

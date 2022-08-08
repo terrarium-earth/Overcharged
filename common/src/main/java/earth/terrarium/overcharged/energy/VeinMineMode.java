@@ -48,7 +48,7 @@ public class VeinMineMode implements ToolMode {
                 for (BlockPos logPos : cachedPositions) {
                     AABB box = new AABB(logPos).inflate(1);
                     Set<BlockPos> logList = BlockPos.betweenClosedStream(box)
-                            .filter(blockPos -> level.getBlockState(blockPos).is(state.getBlock()))
+                            .filter(blockPos -> level.getBlockState(blockPos.immutable()).is(state.getBlock()))
                             .collect(Collectors.toSet());
                     for (BlockPos blockPos : logList) {
                         if (index < limit && energyItem.hasEnoughEnergy(stack, 200)) {
