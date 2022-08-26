@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface AxeItemAccessor {
 
     @Invoker("getStripped")
-    public static Optional<BlockState> invokeGetStripped(BlockState state) {
+    static Optional<BlockState> invokeGetStripped(BlockState state) {
         throw new AssertionError();
     }
 }

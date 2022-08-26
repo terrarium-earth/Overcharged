@@ -1,9 +1,12 @@
 package earth.terrarium.overcharged.registry;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import earth.terrarium.botarium.api.RegistryHolder;
+import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.block.SmashingAnvilBlock;
 import earth.terrarium.overcharged.block.SmashingAnvilBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -18,30 +21,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public class OverchargedBlocks {
-
+    public static final RegistryHolder<Block> BLOCKS = new RegistryHolder<>(Registry.BLOCK, Overcharged.MODID);
+    public static final RegistryHolder<BlockEntityType<?>> BLOCK_ENTITIES = new RegistryHolder<>(Registry.BLOCK_ENTITY_TYPE, Overcharged.MODID);
 
     public static Supplier<SmashingAnvilBlock> ANVIL_BLOCK = registerBlockWithItem("smashing_anvil", () -> new SmashingAnvilBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
-    public static Supplier<BlockEntityType<SmashingAnvilBlockEntity>> ANVIL_BLOCK_ENTITY = registerBlockEntity("smashing_anvil", () -> createBlockEntityType(SmashingAnvilBlockEntity::new, ANVIL_BLOCK.get()));
+    public static Supplier<BlockEntityType<SmashingAnvilBlockEntity>> ANVIL_BLOCK_ENTITY = BLOCK_ENTITIES.register("smashing_anvil", () -> createBlockEntityType(SmashingAnvilBlockEntity::new, ANVIL_BLOCK.get()));
 //register coal generator block
-    public static Supplier<Block> COAL_GENERATOR_BLOCK = registerBlock("coal_generator", () -> new Block(BlockBehaviour.Properties.of(Material.STONE).strength(3.0f, 3.0f)));
+    public static Supplier<Block> COAL_GENERATOR_BLOCK = registerBlockWithItem("coal_generator", () -> new Block(BlockBehaviour.Properties.of(Material.STONE).strength(3.0f, 3.0f)));
 
 
-    @ExpectPlatform
-    public static <E extends BlockEntity, T extends BlockEntityType<E>> Supplier<T> registerBlockEntity(String name, Supplier<T> blockEntity) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> block) {
-        throw new AssertionError();
+    public static void registerAll() {
+        BLOCKS.initialize();
+        BLOCK_ENTITIES.initialize();
     }
 
     @ExpectPlatform
     public static <E extends BlockEntity> BlockEntityType<E> createBlockEntityType(BlockEntityFactory<E> factory, Block... blocks) {
         throw new AssertionError();
-    }
-
-    public static void registerAll() {
     }
 
     @FunctionalInterface
@@ -50,8 +46,8 @@ public class OverchargedBlocks {
     }
 
     public static <T extends Block> Supplier<T> registerBlockWithItem(String name, Supplier<T> block) {
-        var registeredBlock = registerBlock(name, block);
-        OverchargedItems.registerItem(name, () -> new BlockItem(registeredBlock.get(), OverchargedItems.props()));
+        var registeredBlock = BLOCKS.register(name, block);
+        OverchargedItems.ITEMS.register(name, () -> new BlockItem(registeredBlock.get(), OverchargedItems.props()));
         return registeredBlock;
     }
 }

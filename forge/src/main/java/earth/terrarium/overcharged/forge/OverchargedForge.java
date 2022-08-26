@@ -4,9 +4,7 @@ import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.energy.ToolMode;
 import earth.terrarium.overcharged.network.NetworkHandler;
-import earth.terrarium.overcharged.registry.forge.OverchargedBlocksImpl;
-import earth.terrarium.overcharged.registry.forge.OverchargedItemsImpl;
-import earth.terrarium.overcharged.registry.forge.OverchargedRecipesImpl;
+import earth.terrarium.overcharged.registry.forge.OverchargedEntitiesImpl;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,10 +26,7 @@ public class OverchargedForge {
         Overcharged.init();
         //get mod event bus
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        OverchargedItemsImpl.ITEMS.register(eventBus);
-        OverchargedBlocksImpl.BLOCKS.register(eventBus);
-        OverchargedRecipesImpl.RECIPE_TYPES.register(eventBus);
-        OverchargedRecipesImpl.RECIPE_SERIALIZERS.register(eventBus);
+        OverchargedEntitiesImpl.ENTITIES.register(eventBus);
         eventBus.addListener(this::commonSetup);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> OverchargedForgeClient::init);
         MinecraftForge.EVENT_BUS.register(this);
@@ -47,7 +42,7 @@ public class OverchargedForge {
         if (player == null) return;
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof EnergyItem energyItem) {
-            if (!energyItem.hasEnoughEnergy(stack, 200)) return;
+            if (energyItem.getEnergyLevel() < 200) return;
             Level level = event.getPlayer().getLevel();
             ToolMode currentToolMode = energyItem.getCurrentToolMode(stack);
             if(currentToolMode != null) {
