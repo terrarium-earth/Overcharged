@@ -5,6 +5,7 @@ import com.teamresourceful.resourcefullib.common.networking.base.PacketContext;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketHandler;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +41,7 @@ public record EmpoweredPacket() implements Packet<EmpoweredPacket> {
             return (player, level) -> {
                 ItemStack stack = player.getMainHandItem();
                 if (stack.getItem() instanceof EnergyItem) {
-                    EnergyItem.toggleEmpowered(stack);
+                    ToolUtils.toggleEmpowered(stack);
                 }
             };
         }

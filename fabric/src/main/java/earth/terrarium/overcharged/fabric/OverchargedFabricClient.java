@@ -1,10 +1,8 @@
 package earth.terrarium.overcharged.fabric;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.architectury.event.events.client.ClientTickEvent;
 import earth.terrarium.overcharged.OverchargedClient;
 import earth.terrarium.overcharged.energy.EnergyItem;
-import earth.terrarium.overcharged.item.ConstantanAIOT;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
@@ -13,7 +11,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -53,11 +50,6 @@ public class OverchargedFabricClient implements ClientModInitializer {
                     }
                     while (TOOL_MODE_KEYBIND.consumeClick()) {
                         NetworkHandler.CHANNEL.sendToServer(new ToolModeCyclePacket(stack.getOrCreateTag().getInt("ToolMode") + 1));
-                    }
-                    while (TOOL_TYPE_KEYBIND.consumeClick()) {
-                        if(stack.getItem() instanceof ConstantanAIOT aiot) {
-                            NetworkHandler.CHANNEL.sendToServer(new AIOTToolTypePacket(aiot.changeToolType(player, stack)));
-                        }
                     }
                 }
             }

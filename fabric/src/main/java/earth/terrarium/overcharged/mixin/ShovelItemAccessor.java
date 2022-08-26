@@ -12,7 +12,7 @@ import java.util.Map;
 public interface ShovelItemAccessor {
 
     @Accessor("FLATTENABLES")
-    public static Map<Block, BlockState> getFlatennables() {
+    static Map<Block, BlockState> getFlatennables() {
         throw new AssertionError();
     }
 }

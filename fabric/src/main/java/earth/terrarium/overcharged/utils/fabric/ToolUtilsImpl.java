@@ -11,10 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.logging.log4j.LogManager;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class ToolUtilsImpl {

@@ -8,12 +8,15 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
 import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.registry.OverchargedItems;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -29,8 +32,10 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -44,7 +49,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ToolUtils {
-    protected static final Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>> TILLABLES = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Pair.of(HoeItem::onlyIfAirAbove, HoeItem.changeIntoState(Blocks.FARMLAND.defaultBlockState())), Blocks.DIRT_PATH, Pair.of(HoeItem::onlyIfAirAbove, HoeItem.changeIntoState(Blocks.FARMLAND.defaultBlockState())), Blocks.DIRT, Pair.of(HoeItem::onlyIfAirAbove, HoeItem.changeIntoState(Blocks.FARMLAND.defaultBlockState())), Blocks.COARSE_DIRT, Pair.of(HoeItem::onlyIfAirAbove, HoeItem.changeIntoState(Blocks.DIRT.defaultBlockState())), Blocks.ROOTED_DIRT, Pair.of(useOnContext -> true, HoeItem.changeIntoStateAndDropItem(Blocks.DIRT.defaultBlockState(), Items.HANGING_ROOTS))));
     public static final Vector3f GLOWSTONE_COLOR = new Vector3f(Vec3.fromRGB24(0xffd324));
     public static final DustParticleOptions GLOWSTONE = new DustParticleOptions(GLOWSTONE_COLOR, 1.0f);
 
@@ -103,7 +107,7 @@ public class ToolUtils {
     }
 
     public static void areaUseOnBlock(UseOnContext context, Consumer<UseOnContext> consumer) {
-        if(EnergyItem.isEmpowered(context.getItemInHand())) {
+        if(isEmpowered(context.getItemInHand())) {
             BlockPos.betweenClosedStream(context.getClickedPos().offset(1, 0, 1), context.getClickedPos().offset(-1, 0, -1))
                     .map(blockPos -> new BlockHitResult(context.getClickLocation(), context.getClickedFace(), blockPos.immutable(), false))
                     .map(blockHitResult -> new UseOnContext(Objects.requireNonNull(context.getPlayer()), context.getHand(), blockHitResult))
@@ -122,12 +126,121 @@ public class ToolUtils {
 
     public static float itemProperty(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
         if (itemStack.getItem() instanceof EnergyItem energyItem) {
-            if(EnergyItem.isEmpowered(itemStack) && energyItem.hasEnoughEnergy(itemStack, 1)) {
+            if(isEmpowered(itemStack) && energyItem.hasEnoughEnergy(itemStack, 1)) {
                 return 1.0f;
             } else if(energyItem.hasEnoughEnergy(itemStack, 1)){
                 return 0.5f;
             }
         }
         return 0;
+    }
+
+    public static InteractionResult hoeAction(UseOnContext useOnContext) {
+        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
+            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
+            BlockPos blockPos;
+            Level level = useOnContext.getLevel();
+            BlockState till = ToolUtils.getToolModifiedState(level.getBlockState(blockPos = useOnContext.getClickedPos()), useOnContext, "till");
+            if (till != null) {
+                Player player = useOnContext.getPlayer();
+                level.playSound(player, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f);
+                if (!level.isClientSide) {
+                    level.setBlock(blockPos, till, Block.UPDATE_ALL_IMMEDIATE);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, till));
+                    if (player != null) {
+                        energyItem.drainEnergy(useOnContext.getItemInHand(), 200);
+                    }
+                }
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    public static InteractionResult axeAction(UseOnContext useOnContext) {
+        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
+            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
+            BlockPos blockPos = useOnContext.getClickedPos();
+            Level level = useOnContext.getLevel();
+            Player player2 = useOnContext.getPlayer();
+            BlockState blockState = level.getBlockState(blockPos);
+            BlockState optional = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_strip");
+            BlockState optional2 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_scrape");
+            BlockState optional3 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_wax_off");
+            ItemStack itemStack = useOnContext.getItemInHand();
+            BlockState optional4 = null;
+            if (optional != null) {
+                level.playSound(player2, blockPos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0f, 1.0f);
+                optional4 = optional;
+            } else if (optional2 != null) {
+                level.playSound(player2, blockPos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
+                level.levelEvent(player2, 3005, blockPos, 0);
+                optional4 = optional2;
+            } else if (optional3 != null) {
+                level.playSound(player2, blockPos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0f, 1.0f);
+                level.levelEvent(player2, 3004, blockPos, 0);
+                optional4 = optional3;
+            }
+            if (optional4 != null) {
+                if (player2 instanceof ServerPlayer) {
+                    CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player2, blockPos, itemStack);
+                }
+                level.setBlock(blockPos, optional4, 11);
+                level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player2, optional4));
+                if (player2 != null) {
+                    energyItem.drainEnergy(itemStack, 200);
+                }
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    public static InteractionResult shovelAction(UseOnContext useOnContext) {
+        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
+            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
+            Level level = useOnContext.getLevel();
+            BlockPos blockPos = useOnContext.getClickedPos();
+            BlockState blockState = level.getBlockState(blockPos);
+            if (useOnContext.getClickedFace() == Direction.DOWN) {
+                return InteractionResult.PASS;
+            } else {
+                Player player = useOnContext.getPlayer();
+                BlockState blockState2 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "shovel_flatten");
+                BlockState blockState3 = null;
+                if (blockState2 != null && level.getBlockState(blockPos.above()).isAir()) {
+                    level.playSound(player, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    blockState3 = blockState2;
+                } else if (blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT)) {
+                    if (!level.isClientSide()) {
+                        level.levelEvent(null, 1009, blockPos, 0);
+                    }
+
+                    CampfireBlock.dowse(useOnContext.getPlayer(), level, blockPos, blockState);
+                    blockState3 = blockState.setValue(CampfireBlock.LIT, false);
+                }
+
+                if (blockState3 != null) {
+                    if (!level.isClientSide) {
+                        level.setBlock(blockPos, blockState3, 11);
+                        level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState3));
+                        if (player != null) {
+                            energyItem.drainEnergy(useOnContext.getItemInHand(), 200);
+                        }
+                    }
+
+                    return InteractionResult.sidedSuccess(level.isClientSide);
+                }
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    public static boolean isEmpowered(ItemStack stack) {
+        return stack.getOrCreateTag().getBoolean("Empowered");
+    }
+
+    public static void toggleEmpowered(ItemStack stack) {
+        stack.getOrCreateTag().putBoolean("Empowered", !isEmpowered(stack));
     }
 }

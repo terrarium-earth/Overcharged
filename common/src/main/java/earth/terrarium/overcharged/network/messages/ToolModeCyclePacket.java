@@ -5,8 +5,6 @@ import com.teamresourceful.resourcefullib.common.networking.base.PacketContext;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketHandler;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
-import earth.terrarium.overcharged.energy.ToolMode;
-import earth.terrarium.overcharged.item.ConstantanAIOT;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;

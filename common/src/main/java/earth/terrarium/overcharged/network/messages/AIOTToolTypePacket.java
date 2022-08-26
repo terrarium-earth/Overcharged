@@ -5,12 +5,12 @@ import com.teamresourceful.resourcefullib.common.networking.base.PacketContext;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketHandler;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.EnergyItem;
-import earth.terrarium.overcharged.item.ConstantanAIOT;
+import earth.terrarium.overcharged.utils.ToolType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public record AIOTToolTypePacket(EnergyItem.ToolType toolType) implements Packet<AIOTToolTypePacket> {
+public record AIOTToolTypePacket(ToolType toolType) implements Packet<AIOTToolTypePacket> {
     public static final Handler HANDLER = new Handler();
     public static final ResourceLocation ID = new ResourceLocation(Overcharged.MODID, "aiot_tool_type");
 
@@ -33,16 +33,13 @@ public record AIOTToolTypePacket(EnergyItem.ToolType toolType) implements Packet
 
         @Override
         public AIOTToolTypePacket decode(FriendlyByteBuf friendlyByteBuf) {
-            return new AIOTToolTypePacket(friendlyByteBuf.readEnum(EnergyItem.ToolType.class));
+            return new AIOTToolTypePacket(friendlyByteBuf.readEnum(ToolType.class));
         }
 
         @Override
         public PacketContext handle(AIOTToolTypePacket empoweredPacket) {
             return (player, level) -> {
                 ItemStack stack = player.getMainHandItem();
-                if (stack.getItem() instanceof ConstantanAIOT) {
-                    stack.getOrCreateTag().putString("ToolType", empoweredPacket.toolType().toString());
-                }
             };
         }
     }

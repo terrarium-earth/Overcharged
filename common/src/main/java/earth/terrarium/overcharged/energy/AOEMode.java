@@ -45,7 +45,7 @@ public class AOEMode implements ToolMode {
 
     @Override
     public void useTool(UseOnContext context, Consumer<UseOnContext> consumer) {
-        if(EnergyItem.isEmpowered(context.getItemInHand())) {
+        if(ToolUtils.isEmpowered(context.getItemInHand())) {
             AABB box = new AABB(context.getClickedPos()).inflate(radius);
             BlockPos.betweenClosedStream(box).map(blockPos -> new BlockHitResult(context.getClickLocation(), context.getClickedFace(), blockPos.immutable(), false)).map(blockHitResult -> new UseOnContext(Objects.requireNonNull(context.getPlayer()), context.getHand(), blockHitResult)).forEach(consumer);
         }
@@ -57,7 +57,7 @@ public class AOEMode implements ToolMode {
             BlockHitResult hitResult = ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 Direction direction = hitResult.getDirection();
-                BlockPos anchorPoint = direction == Direction.DOWN || direction == Direction.UP ? hit.getBlockPos() : hit.getBlockPos().offset(0, radius - 1, 0);
+                BlockPos anchorPoint = direction == Direction.DOWN || direction == Direction.UP ? hit.getBlockPos() : hit.getBlockPos().below();
                 BoundingBox box = switch (direction) {
                     case UP, DOWN -> BoundingBox.fromCorners(anchorPoint.offset(radius, 0, radius), anchorPoint.offset(-radius, 0, -radius));
                     case EAST, WEST -> BoundingBox.fromCorners(anchorPoint.offset(0, radius, radius), anchorPoint.offset(0, -radius, -radius));

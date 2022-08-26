@@ -22,7 +22,7 @@ public class OverchargedFabric implements ModInitializer {
             ItemStack stack = player.getMainHandItem();
             if (stack.getItem() instanceof EnergyItem energyItem) {
                 if (!energyItem.hasEnoughEnergy(stack, 200)) return false;
-                if (EnergyItem.isEmpowered(stack)) {
+                if (ToolUtils.isEmpowered(stack)) {
                     ToolMode currentToolMode = energyItem.getCurrentToolMode(stack);
                     if(currentToolMode != null) {
                         currentToolMode.onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);

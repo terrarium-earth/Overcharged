@@ -3,7 +3,6 @@ package earth.terrarium.overcharged.forge;
 import com.mojang.blaze3d.platform.InputConstants;
 import earth.terrarium.overcharged.OverchargedClient;
 import earth.terrarium.overcharged.energy.EnergyItem;
-import earth.terrarium.overcharged.item.ConstantanAIOT;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;

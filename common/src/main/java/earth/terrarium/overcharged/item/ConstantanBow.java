@@ -32,7 +32,7 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     @Override
     public void releaseUsing(@NotNull ItemStack bow, @NotNull Level level, @NotNull LivingEntity livingEntity, int i) {
         if(livingEntity instanceof Player player && bow.getItem() instanceof EnergyItem bowEnergy) {
-            int energyUsage = EnergyItem.isEmpowered(bow) ? 400 : 200;
+            int energyUsage = ToolUtils.isEmpowered(bow) ? 400 : 200;
             float drawPower = BowItem.getPowerForTime(this.getUseDuration(bow) - i);
             if(!bowEnergy.hasEnoughEnergy(bow, energyUsage) || drawPower < 0.1F) return;
             if (!level.isClientSide) {
@@ -68,7 +68,7 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     @Override
     public InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (player.getAbilities().instabuild || this.hasEnoughEnergy(itemStack, EnergyItem.isEmpowered(itemStack) ? 400 : 200)) {
+        if (player.getAbilities().instabuild || this.hasEnoughEnergy(itemStack, ToolUtils.isEmpowered(itemStack) ? 400 : 200)) {
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
@@ -80,7 +80,7 @@ public class ConstantanBow extends BowItem implements EnergyItem {
         if(arrow != null) {
             arrow.setOwner(player);
             arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
-            arrow.setEmpowered(EnergyItem.isEmpowered(bow));
+            arrow.setEmpowered(ToolUtils.isEmpowered(bow));
             return arrow;
         }
         return null;
