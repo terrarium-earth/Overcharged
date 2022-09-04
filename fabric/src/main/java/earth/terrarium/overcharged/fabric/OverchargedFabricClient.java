@@ -2,9 +2,8 @@ package earth.terrarium.overcharged.fabric;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import earth.terrarium.overcharged.OverchargedClient;
-import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.network.NetworkHandler;
-import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
 import earth.terrarium.overcharged.network.messages.ToolModeCyclePacket;
 import net.fabricmc.api.ClientModInitializer;
@@ -44,7 +43,7 @@ public class OverchargedFabricClient implements ClientModInitializer {
             Player player = client.player;
             if (player != null) {
                 ItemStack stack = player.getMainHandItem();
-                if (stack.getItem() instanceof EnergyItem) {
+                if (stack.getItem() instanceof ConstantanItem) {
                     while (EMPOWER_KEYBIND.consumeClick()) {
                         NetworkHandler.CHANNEL.sendToServer(new EmpoweredPacket());
                     }

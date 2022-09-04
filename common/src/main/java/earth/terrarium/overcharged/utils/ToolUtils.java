@@ -1,13 +1,11 @@
 package earth.terrarium.overcharged.utils;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3f;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
-import earth.terrarium.overcharged.energy.EnergyItem;
-import earth.terrarium.overcharged.registry.OverchargedItems;
+import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -24,29 +22,22 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class ToolUtils {
     public static final Vector3f GLOWSTONE_COLOR = new Vector3f(Vec3.fromRGB24(0xffd324));
@@ -66,17 +57,19 @@ public class ToolUtils {
         }
     };
 
-    public static boolean mineBlock(EnergyItem item, @NotNull ItemStack itemStack, Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, int damage) {
-        if (!level.isClientSide && blockState.getDestroySpeed(level, blockPos) != 0.0f && item.hasEnoughEnergy(itemStack, damage)) {
-            item.drainEnergy(itemStack, damage);
+    public static boolean mineBlock(@NotNull ItemStack itemStack, Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, int damage) {
+        PlatformEnergyManager energy = EnergyManager.getItemHandler(itemStack);
+        if (!level.isClientSide && blockState.getDestroySpeed(level, blockPos) != 0.0f && energy.getStoredEnergy() >= 200) {
+            energy.extract(damage, false);
             return true;
         }
         return false;
     }
 
-    public static boolean hurtEnemy(EnergyItem item, @NotNull ItemStack itemStack, LivingEntity livingEntity, LivingEntity livingEntity2, int damage) {
-        if(item.hasEnoughEnergy(itemStack, damage)) {
-            item.drainEnergy(itemStack, damage);
+    public static boolean hurtEnemy(@NotNull ItemStack itemStack, LivingEntity livingEntity, LivingEntity livingEntity2, int damage) {
+        PlatformEnergyManager energy = EnergyManager.getItemHandler(itemStack);
+        if(energy.getStoredEnergy() > damage) {
+            energy.extract(damage, false);
             return true;
         }
         return false;
@@ -125,10 +118,11 @@ public class ToolUtils {
     }
 
     public static float itemProperty(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
-        if (itemStack.getItem() instanceof EnergyItem energyItem) {
-            if(isEmpowered(itemStack) && energyItem.hasEnoughEnergy(itemStack, 1)) {
+        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(itemStack);
+        if(energyItem.getStoredEnergy() > 0) {
+            if (isEmpowered(itemStack)) {
                 return 1.0f;
-            } else if(energyItem.hasEnoughEnergy(itemStack, 1)){
+            } else {
                 return 0.5f;
             }
         }
@@ -136,101 +130,98 @@ public class ToolUtils {
     }
 
     public static InteractionResult hoeAction(UseOnContext useOnContext) {
-        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
-            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
-            BlockPos blockPos;
-            Level level = useOnContext.getLevel();
-            BlockState till = ToolUtils.getToolModifiedState(level.getBlockState(blockPos = useOnContext.getClickedPos()), useOnContext, "till");
-            if (till != null) {
-                Player player = useOnContext.getPlayer();
-                level.playSound(player, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f);
-                if (!level.isClientSide) {
-                    level.setBlock(blockPos, till, Block.UPDATE_ALL_IMMEDIATE);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, till));
-                    if (player != null) {
-                        energyItem.drainEnergy(useOnContext.getItemInHand(), 200);
-                    }
+        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
+        BlockPos blockPos;
+        Level level = useOnContext.getLevel();
+        BlockState till = ToolUtils.getToolModifiedState(level.getBlockState(blockPos = useOnContext.getClickedPos()), useOnContext, "till");
+        if (till != null) {
+            Player player = useOnContext.getPlayer();
+            level.playSound(player, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f);
+            if (!level.isClientSide) {
+                level.setBlock(blockPos, till, Block.UPDATE_ALL_IMMEDIATE);
+                level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, till));
+                if (player != null) {
+                    energyItem.extract(200, false);
                 }
-                return InteractionResult.sidedSuccess(level.isClientSide);
             }
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return InteractionResult.PASS;
     }
 
     public static InteractionResult axeAction(UseOnContext useOnContext) {
-        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
-            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
-            BlockPos blockPos = useOnContext.getClickedPos();
-            Level level = useOnContext.getLevel();
-            Player player2 = useOnContext.getPlayer();
-            BlockState blockState = level.getBlockState(blockPos);
-            BlockState optional = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_strip");
-            BlockState optional2 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_scrape");
-            BlockState optional3 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_wax_off");
-            ItemStack itemStack = useOnContext.getItemInHand();
-            BlockState optional4 = null;
-            if (optional != null) {
-                level.playSound(player2, blockPos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0f, 1.0f);
-                optional4 = optional;
-            } else if (optional2 != null) {
-                level.playSound(player2, blockPos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
-                level.levelEvent(player2, 3005, blockPos, 0);
-                optional4 = optional2;
-            } else if (optional3 != null) {
-                level.playSound(player2, blockPos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0f, 1.0f);
-                level.levelEvent(player2, 3004, blockPos, 0);
-                optional4 = optional3;
+        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
+        BlockPos blockPos = useOnContext.getClickedPos();
+        Level level = useOnContext.getLevel();
+        Player player2 = useOnContext.getPlayer();
+        BlockState blockState = level.getBlockState(blockPos);
+        BlockState optional = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_strip");
+        BlockState optional2 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_scrape");
+        BlockState optional3 = ToolUtils.getToolModifiedState(blockState, useOnContext, "axe_wax_off");
+        ItemStack itemStack = useOnContext.getItemInHand();
+        BlockState optional4 = null;
+        if (optional != null) {
+            level.playSound(player2, blockPos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0f, 1.0f);
+            optional4 = optional;
+        } else if (optional2 != null) {
+            level.playSound(player2, blockPos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.levelEvent(player2, 3005, blockPos, 0);
+            optional4 = optional2;
+        } else if (optional3 != null) {
+            level.playSound(player2, blockPos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.levelEvent(player2, 3004, blockPos, 0);
+            optional4 = optional3;
+        }
+        if (optional4 != null) {
+            if (player2 instanceof ServerPlayer) {
+                CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player2, blockPos, itemStack);
             }
-            if (optional4 != null) {
-                if (player2 instanceof ServerPlayer) {
-                    CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player2, blockPos, itemStack);
-                }
-                level.setBlock(blockPos, optional4, 11);
-                level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player2, optional4));
-                if (player2 != null) {
-                    energyItem.drainEnergy(itemStack, 200);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+            level.setBlock(blockPos, optional4, 11);
+            level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player2, optional4));
+            if (player2 != null) {
+                energyItem.extract(200, false);
             }
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return InteractionResult.PASS;
     }
 
     public static InteractionResult shovelAction(UseOnContext useOnContext) {
-        if (useOnContext.getItemInHand().getItem() instanceof EnergyItem energyItem) {
-            if (!energyItem.hasEnoughEnergy(useOnContext.getItemInHand(), 200)) return InteractionResult.PASS;
-            Level level = useOnContext.getLevel();
-            BlockPos blockPos = useOnContext.getClickedPos();
-            BlockState blockState = level.getBlockState(blockPos);
-            if (useOnContext.getClickedFace() == Direction.DOWN) {
-                return InteractionResult.PASS;
-            } else {
-                Player player = useOnContext.getPlayer();
-                BlockState blockState2 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "shovel_flatten");
-                BlockState blockState3 = null;
-                if (blockState2 != null && level.getBlockState(blockPos.above()).isAir()) {
-                    level.playSound(player, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    blockState3 = blockState2;
-                } else if (blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT)) {
-                    if (!level.isClientSide()) {
-                        level.levelEvent(null, 1009, blockPos, 0);
-                    }
-
-                    CampfireBlock.dowse(useOnContext.getPlayer(), level, blockPos, blockState);
-                    blockState3 = blockState.setValue(CampfireBlock.LIT, false);
+        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
+        Level level = useOnContext.getLevel();
+        BlockPos blockPos = useOnContext.getClickedPos();
+        BlockState blockState = level.getBlockState(blockPos);
+        if (useOnContext.getClickedFace() == Direction.DOWN) {
+            return InteractionResult.PASS;
+        } else {
+            Player player = useOnContext.getPlayer();
+            BlockState blockState2 = ToolUtils.getToolModifiedState(level.getBlockState(blockPos), useOnContext, "shovel_flatten");
+            BlockState blockState3 = null;
+            if (blockState2 != null && level.getBlockState(blockPos.above()).isAir()) {
+                level.playSound(player, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+                blockState3 = blockState2;
+            } else if (blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT)) {
+                if (!level.isClientSide()) {
+                    level.levelEvent(null, 1009, blockPos, 0);
                 }
 
-                if (blockState3 != null) {
-                    if (!level.isClientSide) {
-                        level.setBlock(blockPos, blockState3, 11);
-                        level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState3));
-                        if (player != null) {
-                            energyItem.drainEnergy(useOnContext.getItemInHand(), 200);
-                        }
-                    }
+                CampfireBlock.dowse(useOnContext.getPlayer(), level, blockPos, blockState);
+                blockState3 = blockState.setValue(CampfireBlock.LIT, false);
+            }
 
-                    return InteractionResult.sidedSuccess(level.isClientSide);
+            if (blockState3 != null) {
+                if (!level.isClientSide) {
+                    level.setBlock(blockPos, blockState3, 11);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState3));
+                    if (player != null) {
+                        energyItem.extract(200, false);
+                    }
                 }
+
+                return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
         return InteractionResult.PASS;
@@ -242,5 +233,15 @@ public class ToolUtils {
 
     public static void toggleEmpowered(ItemStack stack) {
         stack.getOrCreateTag().putBoolean("Empowered", !isEmpowered(stack));
+    }
+
+    public static int energyBar(ItemStack energyStack) {
+        PlatformEnergyManager energy = EnergyManager.getItemHandler(energyStack);
+        return (int)(((double) energy.getStoredEnergy() / energy.getCapacity()) * 13);
+    }
+
+    public static boolean isBarVisible(ItemStack itemStack) {
+        PlatformEnergyManager energyStorage = EnergyManager.getItemHandler(itemStack);
+        return energyStorage.getStoredEnergy() > 0;
     }
 }

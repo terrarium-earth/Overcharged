@@ -2,7 +2,7 @@ package earth.terrarium.overcharged.forge;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import earth.terrarium.overcharged.OverchargedClient;
-import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
@@ -68,18 +68,20 @@ public class OverchargedForgeClient {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
             ItemStack stack = player.getMainHandItem();
-            if (stack.getItem() instanceof EnergyItem) {
+            if (stack.getItem() instanceof ConstantanItem) {
                 while (EMPOWER_KEYBIND.consumeClick()) {
                     NetworkHandler.CHANNEL.sendToServer(new EmpoweredPacket());
                 }
                 while (TOOL_MODE_KEYBIND.consumeClick()) {
                     NetworkHandler.CHANNEL.sendToServer(new ToolModeCyclePacket(stack.getOrCreateTag().getInt("ToolMode") + 1));
                 }
+                /*
                 while (TOOL_TYPE_KEYBIND.consumeClick()) {
                     if (stack.getItem() instanceof ConstantanAIOT aiot) {
                         NetworkHandler.CHANNEL.sendToServer(new AIOTToolTypePacket(aiot.changeToolType(player, stack)));
                     }
                 }
+                 */
             }
         }
     }

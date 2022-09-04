@@ -1,6 +1,7 @@
-package earth.terrarium.overcharged.block;
+package earth.terrarium.overcharged.block.generator;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import earth.terrarium.botarium.api.energy.EnergyManager;
 import earth.terrarium.overcharged.utils.PlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 public class GeneratorBlockEntity extends BaseEnergyBlockEntity implements WorldlyContainer, MenuProvider {
 
     private final NonNullList<ItemStack> inventory = NonNullList.withSize(9, ItemStack.EMPTY);
+    private int work;
+    public static final int MAX_WORK = 100;
 
     public GeneratorBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState, 1000000);
@@ -36,7 +39,7 @@ public class GeneratorBlockEntity extends BaseEnergyBlockEntity implements World
         if(direction == Direction.UP) {
             return isFuelItem(itemStack) && (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7);
         } else {
-            return isEnergyItem(itemStack) && i == 8;
+            return EnergyManager.isEnergyItem(itemStack) && i == 8;
         }
     }
 
@@ -107,5 +110,13 @@ public class GeneratorBlockEntity extends BaseEnergyBlockEntity implements World
 
     public static boolean isFuelItem(ItemStack stack) {
         return PlatformUtils.getBurnTime(stack) > 0;
+    }
+
+    public int getWork() {
+        return work;
+    }
+
+    public int getGenerateAmount() {
+        return 0;
     }
 }

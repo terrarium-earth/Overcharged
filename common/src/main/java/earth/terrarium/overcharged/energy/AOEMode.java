@@ -1,12 +1,12 @@
 package earth.terrarium.overcharged.energy;
 
+import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +18,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-import javax.tools.Tool;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +52,8 @@ public class AOEMode implements ToolMode {
 
     @Override
     public void onMineBlock(ItemStack stack, Level level, BlockHitResult hit, Player player) {
-        if (!level.isClientSide() && stack.getItem() instanceof EnergyItem energyItem && stack.getItem() instanceof DiggerItem diggerItem) {
+        if (!level.isClientSide() && stack.getItem() instanceof ConstantanItem constantanItem && stack.getItem() instanceof DiggerItem diggerItem) {
+            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
             BlockHitResult hitResult = ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 Direction direction = hitResult.getDirection();
@@ -66,8 +66,8 @@ public class AOEMode implements ToolMode {
 
                 List<BlockPos> positions = BlockPos.betweenClosedStream(box).map(BlockPos::immutable).filter(blockPos1 -> diggerItem.isCorrectToolForDrops(level.getBlockState(blockPos1)) && level.getBlockState(blockPos1).getDestroySpeed(level, blockPos1) > 0).toList();
                 for (BlockPos position : positions) {
-                    if(energyItem.hasEnoughEnergy(stack, 200)) {
-                        energyItem.drainEnergy(stack, 200);
+                    if(energyItem.getStoredEnergy() >= 200) {
+                        energyItem.extract(200, false);
                         ToolUtils.playerBreak(level, player, stack, position);
                     } else break;
                 }
@@ -77,14 +77,15 @@ public class AOEMode implements ToolMode {
 
     @Override
     public void onHitEntity(ItemStack stack, LivingEntity target, Player player) {
-        if (stack.getItem() instanceof EnergyItem energyItem) {
+        if (stack.getItem() instanceof ConstantanItem) {
+            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
             AABB box = target.getBoundingBox().inflate(radius, Math.min(1, radius * 0.5), radius);
             List<LivingEntity> livingEntityList = player.getLevel().getEntities(ToolUtils.LIVING_ENTITY_TEST, box, livingEntity -> livingEntity != player && livingEntity != target);
             Iterator<LivingEntity> iterator = livingEntityList.iterator();
-            while (iterator.hasNext() && energyItem.hasEnoughEnergy(stack, 200)) {
+            while (iterator.hasNext() && energyItem.getStoredEnergy() > 200) {
                 LivingEntity entity = iterator.next();
                 player.attack(entity);
-                energyItem.drainEnergy(stack, 200);
+                energyItem.extract(200, false);
             }
         }
     }

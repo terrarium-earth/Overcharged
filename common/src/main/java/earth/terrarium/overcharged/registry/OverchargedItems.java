@@ -1,14 +1,15 @@
 package earth.terrarium.overcharged.registry;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import earth.terrarium.botarium.api.RegistryHolder;
+import earth.terrarium.botarium.api.registry.RegistryHolder;
 import earth.terrarium.overcharged.Overcharged;
-import earth.terrarium.overcharged.item.*;
+import earth.terrarium.overcharged.item.ConstantanBow;
+import earth.terrarium.overcharged.item.ConstantanSwordItem;
+import earth.terrarium.overcharged.item.ConstantanTool;
 import earth.terrarium.overcharged.utils.ToolType;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
 
@@ -33,6 +34,8 @@ public class OverchargedItems {
     public static Item.Properties props() {
         return new Item.Properties().tab(Overcharged.TAB);
     }
+
+    public static void init() {}
 
     public static void registerAll() {
         ITEMS.initialize();

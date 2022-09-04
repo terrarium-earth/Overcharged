@@ -1,6 +1,9 @@
 package earth.terrarium.overcharged.item;
 
-import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.botarium.api.energy.EnergyContainer;
+import earth.terrarium.botarium.api.energy.EnergyItem;
+import earth.terrarium.botarium.api.energy.ItemEnergyContainer;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.energy.ToolMode;
 import earth.terrarium.overcharged.entity.PoweredArrow;
 import earth.terrarium.overcharged.registry.OverchargedEntities;
@@ -21,20 +24,19 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.tools.Tool;
 import java.util.List;
 
-public class ConstantanBow extends BowItem implements EnergyItem {
+public class ConstantanBow extends BowItem implements ConstantanItem, EnergyItem {
     public ConstantanBow(Properties properties) {
         super(properties);
     }
 
     @Override
     public void releaseUsing(@NotNull ItemStack bow, @NotNull Level level, @NotNull LivingEntity livingEntity, int i) {
-        if(livingEntity instanceof Player player && bow.getItem() instanceof EnergyItem bowEnergy) {
+        if(livingEntity instanceof Player player) {
             int energyUsage = ToolUtils.isEmpowered(bow) ? 400 : 200;
             float drawPower = BowItem.getPowerForTime(this.getUseDuration(bow) - i);
-            if(!bowEnergy.hasEnoughEnergy(bow, energyUsage) || drawPower < 0.1F) return;
+            if(this.getEnergyStorage(bow).getStoredEnergy() < energyUsage || drawPower < 0.1F) return;
             if (!level.isClientSide) {
                 AbstractArrow abstractArrow = this.createChargedArrow(bow, player);
                 if (abstractArrow == null) {
@@ -59,7 +61,7 @@ public class ConstantanBow extends BowItem implements EnergyItem {
             }
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0f, 1.0f / (level.getRandom().nextFloat() * 0.4f + 1.2f) + drawPower * 0.5f);
             if (!player.getAbilities().instabuild) {
-                bowEnergy.drainEnergy(bow, energyUsage);
+                this.getEnergyStorage(bow).extractEnergy(energyUsage, false);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
@@ -68,7 +70,8 @@ public class ConstantanBow extends BowItem implements EnergyItem {
     @Override
     public InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (player.getAbilities().instabuild || this.hasEnoughEnergy(itemStack, ToolUtils.isEmpowered(itemStack) ? 400 : 200)) {
+        EnergyContainer energy = this.getEnergyStorage(itemStack);
+        if (player.getAbilities().instabuild || energy.getStoredEnergy() >= (ToolUtils.isEmpowered(itemStack) ? 400 : 200)) {
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
@@ -93,16 +96,21 @@ public class ConstantanBow extends BowItem implements EnergyItem {
 
     @Override
     public boolean isBarVisible(@NotNull ItemStack itemStack) {
-        return hasEnoughEnergy(itemStack, 1);
+        return ToolUtils.isBarVisible(itemStack);
     }
 
     @Override
     public int getBarWidth(@NotNull ItemStack itemStack) {
-        return (int)(((double) getEnergy(itemStack) / getMaxEnergy()) * 13);
+        return ToolUtils.energyBar(itemStack);
     }
 
     @Override
     public int getBarColor(@NotNull ItemStack itemStack) {
         return 0xFFDB12;
+    }
+
+    @Override
+    public EnergyContainer getEnergyStorage(ItemStack object) {
+        return new ItemEnergyContainer(object, 800000);
     }
 }

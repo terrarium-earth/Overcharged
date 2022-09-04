@@ -4,7 +4,6 @@ import com.teamresourceful.resourcefullib.common.networking.base.Packet;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketContext;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketHandler;
 import earth.terrarium.overcharged.Overcharged;
-import earth.terrarium.overcharged.energy.EnergyItem;
 import earth.terrarium.overcharged.utils.ToolType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

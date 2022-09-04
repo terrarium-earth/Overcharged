@@ -1,11 +1,10 @@
 package earth.terrarium.overcharged.utils;
 
-import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 
-import java.util.function.BiFunction;
 @FunctionalInterface
 public interface AbstractToolType {
-    InteractionResult apply(EnergyItem energyItem, UseOnContext context);
+    InteractionResult apply(ConstantanItem energyItem, UseOnContext context);
 }

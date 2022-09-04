@@ -1,16 +1,14 @@
 package earth.terrarium.overcharged.fabric;
 
+import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.Overcharged;
-import earth.terrarium.overcharged.energy.EnergyItem;
+import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.energy.ToolMode;
 import earth.terrarium.overcharged.network.NetworkHandler;
-import earth.terrarium.overcharged.registry.OverchargedBlocks;
-import earth.terrarium.overcharged.registry.OverchargedItems;
-import earth.terrarium.overcharged.registry.OverchargedRecipes;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 
@@ -20,10 +18,11 @@ public class OverchargedFabric implements ModInitializer {
         Overcharged.init();
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) ->  {
             ItemStack stack = player.getMainHandItem();
-            if (stack.getItem() instanceof EnergyItem energyItem) {
-                if (!energyItem.hasEnoughEnergy(stack, 200)) return false;
+            if (stack.getItem() instanceof ConstantanItem constantanItem) {
+                PlatformEnergyManager energy = EnergyManager.getItemHandler(stack);
+                if (energy.getStoredEnergy() < 200) return false;
                 if (ToolUtils.isEmpowered(stack)) {
-                    ToolMode currentToolMode = energyItem.getCurrentToolMode(stack);
+                    ToolMode currentToolMode = constantanItem.getCurrentToolMode(stack);
                     if(currentToolMode != null) {
                         currentToolMode.onMineBlock(stack, level, ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY), player);
                     }

@@ -1,12 +1,10 @@
 package earth.terrarium.overcharged.registry;
 
 import com.teamresourceful.resourcefullib.common.recipe.CodecRecipeSerializer;
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import earth.terrarium.botarium.api.RegistryHolder;
+import earth.terrarium.botarium.api.registry.RegistryHolder;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.data.SmashingRecipe;
 import net.minecraft.core.Registry;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -24,6 +22,8 @@ public class OverchargedRecipes {
     });
 
     public static Supplier<RecipeSerializer<SmashingRecipe>> SMASHING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("smashing", () -> new CodecRecipeSerializer<>(SMASHING_RECIPE.get(), SmashingRecipe::codec));
+
+    public static void init() {}
 
     public static void registerAll() {
         RECIPE_TYPES.initialize();
