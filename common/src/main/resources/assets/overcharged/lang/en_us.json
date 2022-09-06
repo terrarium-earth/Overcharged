@@ -1,5 +1,6 @@
 {
   "category.overcharged.tools": "Overcharged",
+  "block.overcharged.coal_generator": "Coal Generator",
   "key.overcharged.toggle_empowered": "Toggle Empowered",
   "key.overcharged.change_tool_type": "Cycle Tool Types",
   "key.overcharged.change_tool_mode": "Cycle Empowered Tool Modes",
@@ -7,6 +8,10 @@
   "tool_mode.overcharged.tooltip.vein_mine": "Vein Mine Mode",
   "messages.overcharged.aiot_tool_type": "Changed AIOT Right Click type to %s",
   "messages.overcharged.constantan_change_mode": "Changed Tool Mode to %s",
+  "gui.overcharged.active": "§2♦§r Active %s",
+  "gui.overcharged.inactive": "§4♦§r Inactive %s",
+  "gui.overcharged.generating": "§6⚡§r %s ⚡/t",
+  "gui.overcharged.efficiency": "§6\uD83D\uDD25§r %s %% \uD83D\uDD25 Eff",
   "gui.overcharged.energy_tooltip": "⚡: %s ⚡ / %s ⚡",
-  "gui.overcharged.work_tooltip": "⌚: %s t / %s t"
+  "gui.overcharged.work_tooltip": "\uD83D\uDD25: %s t / %s t"
 }

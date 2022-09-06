@@ -2,6 +2,7 @@ package earth.terrarium.overcharged.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.teamresourceful.resourcefullib.client.components.selection.SelectionList;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.block.generator.GeneratorBlockEntity;
 import earth.terrarium.overcharged.block.generator.GeneratorData;
@@ -15,6 +16,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class GeneratorScreen extends AbstractContainerScreen<GeneratorMenu> {
     private static final ResourceLocation BASE_SCREEN = new ResourceLocation(Overcharged.MODID, "textures/gui/generator.png");
 
@@ -23,6 +26,18 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorMenu> {
         this.imageWidth = 176;
         this.imageHeight = 190;
         this.inventoryLabelY = 95;
+        this.titleLabelY = 8;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        var boxComponents = addRenderableWidget(new SelectionList(leftPos + 49, topPos + 24, 63, 66, 10, entry -> {}));
+        boxComponents.updateEntries(List.of(
+                new DeferredInfographic(() -> Component.translatable( getGeneratingAmount() > 0 ? "gui.overcharged.active" : "gui.overcharged.inactive" ).withStyle(ChatFormatting.GRAY)),
+                new DeferredInfographic(() -> Component.translatable("gui.overcharged.generating", getGeneratingAmount()).withStyle(ChatFormatting.GRAY)),
+                new DeferredInfographic(() -> Component.translatable("gui.overcharged.efficiency", getEfficiency()).withStyle(ChatFormatting.GRAY))
+        ));
     }
 
     @Override
@@ -42,10 +57,16 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorMenu> {
         super.render(poseStack, mouseX, mouseY, partialTicks);
         this.renderTooltip(poseStack, mouseX, mouseY);
         if(mouseX > leftPos + 133 && mouseX < 146 + leftPos && mouseY > 21 + topPos && mouseY < 88 + topPos) {
-            this.renderTooltip(poseStack, Component.translatable("gui." + Overcharged.MODID + ".energy_tooltip", Component.literal(String.valueOf(getEnergyLevel())).withStyle(ChatFormatting.GOLD), Component.literal(String.valueOf(GeneratorBlockEntity.MAX_ENERGY)).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.AQUA), mouseX, mouseY);
+            this.renderTooltip(poseStack, Component.translatable("gui." + Overcharged.MODID + ".energy_tooltip", Component.literal(String.valueOf(getEnergyLevel())).withStyle(ChatFormatting.GRAY), Component.literal(String.valueOf(GeneratorBlockEntity.MAX_ENERGY)).withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.GOLD), mouseX, mouseY);
         } else if(mouseX > leftPos + 119 && mouseX < 126 + leftPos && mouseY > 21 + topPos && mouseY < 88 + topPos) {
-            this.renderTooltip(poseStack, Component.translatable("gui." + Overcharged.MODID + ".work_tooltip", Component.literal(String.valueOf(getTicks())).withStyle(ChatFormatting.GOLD), Component.literal(String.valueOf(GeneratorBlockEntity.MAX_WORK)).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.AQUA), mouseX, mouseY);
+            this.renderTooltip(poseStack, Component.translatable("gui." + Overcharged.MODID + ".work_tooltip", Component.literal(String.valueOf(getTicks())).withStyle(ChatFormatting.GRAY), Component.literal(String.valueOf(GeneratorBlockEntity.MAX_WORK)).withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.GOLD), mouseX, mouseY);
         }
+    }
+
+    @Override
+    protected void renderLabels(@NotNull PoseStack poseStack, int i, int j) {
+        this.font.draw(poseStack, this.title, (float)this.titleLabelX, (float)this.titleLabelY, 0xffffb62e);
+        this.font.draw(poseStack, this.playerInventoryTitle, (float)this.inventoryLabelX, (float)this.inventoryLabelY, 0xffffb62e);
     }
 
     public int getTicks() {
