@@ -1,6 +1,6 @@
 package earth.terrarium.overcharged.block.generator;
 
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +13,6 @@ public class EnergySlot extends Slot {
 
     @Override
     public boolean mayPlace(@NotNull ItemStack itemStack) {
-        return EnergyManager.isEnergyItem(itemStack);
+        return EnergyHooks.isEnergyItem(itemStack);
     }
 }

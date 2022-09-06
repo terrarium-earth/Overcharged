@@ -1,6 +1,6 @@
 package earth.terrarium.overcharged.fabric;
 
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.ConstantanItem;
@@ -19,7 +19,7 @@ public class OverchargedFabric implements ModInitializer {
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) ->  {
             ItemStack stack = player.getMainHandItem();
             if (stack.getItem() instanceof ConstantanItem constantanItem) {
-                PlatformEnergyManager energy = EnergyManager.getItemHandler(stack);
+                PlatformEnergyManager energy = EnergyHooks.getItemHandler(stack);
                 if (energy.getStoredEnergy() < 200) return false;
                 if (ToolUtils.isEmpowered(stack)) {
                     ToolMode currentToolMode = constantanItem.getCurrentToolMode(stack);

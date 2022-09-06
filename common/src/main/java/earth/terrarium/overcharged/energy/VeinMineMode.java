@@ -1,6 +1,6 @@
 package earth.terrarium.overcharged.energy;
 
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,7 @@ public class VeinMineMode implements ToolMode {
     @Override
     public void onMineBlock(ItemStack stack, Level level, BlockHitResult hit, Player player) {
         if(stack.getItem() instanceof ConstantanItem constantanItem) {
-            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
+            PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(stack);
             List<BlockPos> cachedPositions = new ArrayList<>();
             BlockState state = level.getBlockState(hit.getBlockPos());
             cachedPositions.add(hit.getBlockPos());

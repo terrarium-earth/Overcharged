@@ -19,7 +19,7 @@ public class ConstantanSwordItem extends SwordItem implements ConstantanItem, En
     @Override
     public float getDestroySpeed(@NotNull ItemStack itemStack, @NotNull BlockState blockState) {
         float speed = super.getDestroySpeed(itemStack, blockState);
-        PlatformEnergyManager energyStorage = EnergyManager.getItemHandler(itemStack);
+        PlatformEnergyManager energyStorage = EnergyHooks.getItemHandler(itemStack);
         return energyStorage.getStoredEnergy() >= 400 ? ToolUtils.isEmpowered(itemStack) ? speed * 1.2F : speed : 0;
     }
 

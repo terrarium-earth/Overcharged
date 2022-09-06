@@ -72,6 +72,7 @@ public class ConstantanBow extends BowItem implements ConstantanItem, EnergyItem
         ItemStack itemStack = player.getItemInHand(interactionHand);
         EnergyContainer energy = this.getEnergyStorage(itemStack);
         if (player.getAbilities().instabuild || energy.getStoredEnergy() >= (ToolUtils.isEmpowered(itemStack) ? 400 : 200)) {
+            player.startUsingItem(interactionHand);
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);

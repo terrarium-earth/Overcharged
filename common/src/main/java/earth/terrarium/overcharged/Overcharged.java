@@ -2,10 +2,7 @@ package earth.terrarium.overcharged;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import earth.terrarium.overcharged.network.NetworkHandler;
-import earth.terrarium.overcharged.registry.OverchargedBlocks;
-import earth.terrarium.overcharged.registry.OverchargedEntities;
-import earth.terrarium.overcharged.registry.OverchargedItems;
-import earth.terrarium.overcharged.registry.OverchargedRecipes;
+import earth.terrarium.overcharged.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +23,15 @@ public class Overcharged {
         OverchargedItems.init();
         OverchargedRecipes.init();
         OverchargedEntities.init();
+        OverchargedMenus.init();
+    }
+
+    public static void registerAll() {
+        OverchargedBlocks.registerAll();
+        OverchargedItems.registerAll();
+        OverchargedRecipes.registerAll();
+        OverchargedEntities.registerAll();
+        OverchargedMenus.registerAll();
     }
 
     @ExpectPlatform

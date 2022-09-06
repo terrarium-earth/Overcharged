@@ -16,22 +16,29 @@ import org.jetbrains.annotations.NotNull;
 public class GeneratorMenu extends AbstractContainerMenu {
     private final Container container;
     public final ContainerData data;
-    public final boolean missingPylons;
-    public final boolean missingInventory;
 
-    protected GeneratorMenu(Container container, ContainerData data, int i, Inventory inventory, boolean missingPylons, boolean missingInventory) {
+    protected GeneratorMenu(Container container, ContainerData data, int i, Inventory inventory) {
         super(OverchargedMenus.GENERATOR_MENU.get(), i);
         this.container = container;
         this.data = data;
-        this.missingPylons = missingPylons;
-        this.missingInventory = missingInventory;
-        //this.addSlot(new Slot(this.container, 0, 184, 83));
+
+        int slot = 0;
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 2; x++) {
+                this.addSlot(new FuelSlot(container, slot, 8 + x * 18, 20 + y * 18));
+                slot++;
+            }
+        }
+
+        for (int y = 0; y < 4; y++) {
+            this.addSlot(new Slot(container, y + 8, 152, 20 + y * 18));
+        }
         addPlayerInvSlots(inventory);
         addDataSlots(data);
     }
 
     public GeneratorMenu(int i, Inventory inventory, FriendlyByteBuf byteBuf) {
-        this(new SimpleContainer(2), new SimpleContainerData(5), i, inventory, byteBuf.readBoolean(), byteBuf.readBoolean());
+        this(new SimpleContainer(12), new SimpleContainerData(4), i, inventory);
     }
 
     @Override
@@ -65,14 +72,14 @@ public class GeneratorMenu extends AbstractContainerMenu {
     }
 
     protected void addPlayerInvSlots(Inventory inventory) {
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(inventory, j + i * 9 + 9, 24 + j * 18, 120 + i * 18));
+        for (int y = 0; y < 3; ++y) {
+            for (int x = 0; x < 9; ++x) {
+                this.addSlot(new Slot(inventory, x + y * 9 + 9, 8 + x * 18, 108 + y * 18));
             }
         }
 
-        for (int k = 0; k < 9; ++k) {
-            this.addSlot(new Slot(inventory, k, 24 + k * 18, 120 + 58));
+        for (int i = 0; i < 9; ++i) {
+            this.addSlot(new Slot(inventory, i, 8 + i * 18, 108 + 58));
         }
     }
 }

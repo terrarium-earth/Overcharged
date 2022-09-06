@@ -3,7 +3,7 @@ package earth.terrarium.overcharged.utils;
 import com.mojang.math.Vector3f;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.energy.ConstantanItem;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -58,7 +58,7 @@ public class ToolUtils {
     };
 
     public static boolean mineBlock(@NotNull ItemStack itemStack, Level level, @NotNull BlockState blockState, @NotNull BlockPos blockPos, int damage) {
-        PlatformEnergyManager energy = EnergyManager.getItemHandler(itemStack);
+        PlatformEnergyManager energy = EnergyHooks.getItemHandler(itemStack);
         if (!level.isClientSide && blockState.getDestroySpeed(level, blockPos) != 0.0f && energy.getStoredEnergy() >= 200) {
             energy.extract(damage, false);
             return true;
@@ -67,7 +67,7 @@ public class ToolUtils {
     }
 
     public static boolean hurtEnemy(@NotNull ItemStack itemStack, LivingEntity livingEntity, LivingEntity livingEntity2, int damage) {
-        PlatformEnergyManager energy = EnergyManager.getItemHandler(itemStack);
+        PlatformEnergyManager energy = EnergyHooks.getItemHandler(itemStack);
         if(energy.getStoredEnergy() > damage) {
             energy.extract(damage, false);
             return true;
@@ -118,7 +118,7 @@ public class ToolUtils {
     }
 
     public static float itemProperty(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int i) {
-        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(itemStack);
+        PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(itemStack);
         if(energyItem.getStoredEnergy() > 0) {
             if (isEmpowered(itemStack)) {
                 return 1.0f;
@@ -130,7 +130,7 @@ public class ToolUtils {
     }
 
     public static InteractionResult hoeAction(UseOnContext useOnContext) {
-        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(useOnContext.getItemInHand());
         if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
         BlockPos blockPos;
         Level level = useOnContext.getLevel();
@@ -151,7 +151,7 @@ public class ToolUtils {
     }
 
     public static InteractionResult axeAction(UseOnContext useOnContext) {
-        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(useOnContext.getItemInHand());
         if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
         BlockPos blockPos = useOnContext.getClickedPos();
         Level level = useOnContext.getLevel();
@@ -189,7 +189,7 @@ public class ToolUtils {
     }
 
     public static InteractionResult shovelAction(UseOnContext useOnContext) {
-        PlatformEnergyManager energyItem = EnergyManager.getItemHandler(useOnContext.getItemInHand());
+        PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(useOnContext.getItemInHand());
         if (energyItem.getStoredEnergy() < 200) return InteractionResult.PASS;
         Level level = useOnContext.getLevel();
         BlockPos blockPos = useOnContext.getClickedPos();
@@ -236,12 +236,12 @@ public class ToolUtils {
     }
 
     public static int energyBar(ItemStack energyStack) {
-        PlatformEnergyManager energy = EnergyManager.getItemHandler(energyStack);
+        PlatformEnergyManager energy = EnergyHooks.getItemHandler(energyStack);
         return (int)(((double) energy.getStoredEnergy() / energy.getCapacity()) * 13);
     }
 
     public static boolean isBarVisible(ItemStack itemStack) {
-        PlatformEnergyManager energyStorage = EnergyManager.getItemHandler(itemStack);
+        PlatformEnergyManager energyStorage = EnergyHooks.getItemHandler(itemStack);
         return energyStorage.getStoredEnergy() > 0;
     }
 }

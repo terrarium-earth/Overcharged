@@ -1,15 +1,11 @@
 package earth.terrarium.overcharged.forge;
 
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.Overcharged;
 import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.energy.ToolMode;
 import earth.terrarium.overcharged.network.NetworkHandler;
-import earth.terrarium.overcharged.registry.OverchargedBlocks;
-import earth.terrarium.overcharged.registry.OverchargedEntities;
-import earth.terrarium.overcharged.registry.OverchargedItems;
-import earth.terrarium.overcharged.registry.OverchargedRecipes;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,10 +27,7 @@ public class OverchargedForge {
         Overcharged.init();
         //get mod event bus
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        OverchargedBlocks.registerAll();
-        OverchargedItems.registerAll();
-        OverchargedRecipes.registerAll();
-        OverchargedEntities.registerAll();
+        Overcharged.registerAll();
         eventBus.addListener(this::commonSetup);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> OverchargedForgeClient::init);
         MinecraftForge.EVENT_BUS.register(this);
@@ -50,7 +43,7 @@ public class OverchargedForge {
         if (player == null) return;
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof ConstantanItem constantanItem) {
-            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
+            PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(stack);
             if (energyItem.getStoredEnergy() < 200) return;
             Level level = event.getPlayer().getLevel();
             ToolMode currentToolMode = constantanItem.getCurrentToolMode(stack);

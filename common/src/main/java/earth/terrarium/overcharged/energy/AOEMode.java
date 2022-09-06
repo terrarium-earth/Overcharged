@@ -1,6 +1,6 @@
 package earth.terrarium.overcharged.energy;
 
-import earth.terrarium.botarium.api.energy.EnergyManager;
+import earth.terrarium.botarium.api.energy.EnergyHooks;
 import earth.terrarium.botarium.api.energy.PlatformEnergyManager;
 import earth.terrarium.overcharged.utils.ToolUtils;
 import net.minecraft.core.BlockPos;
@@ -53,7 +53,7 @@ public class AOEMode implements ToolMode {
     @Override
     public void onMineBlock(ItemStack stack, Level level, BlockHitResult hit, Player player) {
         if (!level.isClientSide() && stack.getItem() instanceof ConstantanItem constantanItem && stack.getItem() instanceof DiggerItem diggerItem) {
-            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
+            PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(stack);
             BlockHitResult hitResult = ToolUtils.getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 Direction direction = hitResult.getDirection();
@@ -78,7 +78,7 @@ public class AOEMode implements ToolMode {
     @Override
     public void onHitEntity(ItemStack stack, LivingEntity target, Player player) {
         if (stack.getItem() instanceof ConstantanItem) {
-            PlatformEnergyManager energyItem = EnergyManager.getItemHandler(stack);
+            PlatformEnergyManager energyItem = EnergyHooks.getItemHandler(stack);
             AABB box = target.getBoundingBox().inflate(radius, Math.min(1, radius * 0.5), radius);
             List<LivingEntity> livingEntityList = player.getLevel().getEntities(ToolUtils.LIVING_ENTITY_TEST, box, livingEntity -> livingEntity != player && livingEntity != target);
             Iterator<LivingEntity> iterator = livingEntityList.iterator();

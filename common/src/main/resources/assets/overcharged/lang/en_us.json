@@ -6,5 +6,7 @@
   "tool_mode.overcharged.tooltip.area_break": "%sx%s AOE Mode",
   "tool_mode.overcharged.tooltip.vein_mine": "Vein Mine Mode",
   "messages.overcharged.aiot_tool_type": "Changed AIOT Right Click type to %s",
-  "messages.overcharged.constantan_change_mode": "Changed Tool Mode to %s"
+  "messages.overcharged.constantan_change_mode": "Changed Tool Mode to %s",
+  "gui.overcharged.energy_tooltip": "⚡: %s ⚡ / %s ⚡",
+  "gui.overcharged.work_tooltip": "⌚: %s t / %s t"
 }

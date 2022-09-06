@@ -7,6 +7,7 @@ public class GeneratorData implements ContainerData {
     public static final int ENERGY_LEVEL = 0;
     public static final int WORK = 1;
     public static final int GENERATING = 2;
+    public static final int EFFICIENCY = 3;
 
     public GeneratorData(GeneratorBlockEntity energyBlock) {
         this.generator = energyBlock;
@@ -18,6 +19,7 @@ public class GeneratorData implements ContainerData {
             case ENERGY_LEVEL -> (int) generator.getEnergyStorage().getStoredEnergy();
             case WORK -> generator.getWork();
             case GENERATING -> generator.getGenerateAmount();
+            case EFFICIENCY -> (int) (generator.getEfficiency() * 100.0);
             default -> throw new IllegalStateException("Unexpected value: " + i);
         };
     }
@@ -28,6 +30,6 @@ public class GeneratorData implements ContainerData {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 }

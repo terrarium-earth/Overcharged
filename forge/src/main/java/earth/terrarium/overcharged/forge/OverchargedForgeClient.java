@@ -2,13 +2,16 @@ package earth.terrarium.overcharged.forge;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import earth.terrarium.overcharged.OverchargedClient;
+import earth.terrarium.overcharged.client.GeneratorScreen;
 import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.network.messages.AIOTToolTypePacket;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
 import earth.terrarium.overcharged.network.messages.ToolModeCyclePacket;
+import earth.terrarium.overcharged.registry.OverchargedMenus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -62,6 +65,7 @@ public class OverchargedForgeClient {
     @SubscribeEvent
     public static void onInitializeClient(FMLClientSetupEvent event) {
         OverchargedClient.initClient();
+        MenuScreens.register(OverchargedMenus.GENERATOR_MENU.get(), GeneratorScreen::new);
     }
 
     public static void keybindAction(InputEvent.Key event) {

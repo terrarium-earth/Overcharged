@@ -2,14 +2,17 @@ package earth.terrarium.overcharged.fabric;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import earth.terrarium.overcharged.OverchargedClient;
+import earth.terrarium.overcharged.client.GeneratorScreen;
 import earth.terrarium.overcharged.energy.ConstantanItem;
 import earth.terrarium.overcharged.network.NetworkHandler;
 import earth.terrarium.overcharged.network.messages.EmpoweredPacket;
 import earth.terrarium.overcharged.network.messages.ToolModeCyclePacket;
+import earth.terrarium.overcharged.registry.OverchargedMenus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -53,5 +56,6 @@ public class OverchargedFabricClient implements ClientModInitializer {
                 }
             }
         });
+        MenuScreens.register(OverchargedMenus.GENERATOR_MENU.get(), GeneratorScreen::new);
     }
 }
